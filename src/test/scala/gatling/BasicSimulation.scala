@@ -27,7 +27,7 @@ object ReviewingAPie {
       .check(
         status.is(200),
         jsonPath("$[*]").count.gt(0),
-        jsonPath("$[*]").findAll.saveAs("uuids") // FIXME
+        jsonPath("$[*]").findAll.saveAs("uuids")
       )
   )
   .exitHereIfFailed
@@ -46,17 +46,20 @@ object ReviewingAPie {
   .exec(
     http("Get Chosen Pie")
       .get("/pie/${uuid}")
-      .check(status.is(200))
+      .check(status.in(200, 304))
   )
   .pause(3)
   .feed(reviewsData.random.circular)
   .exec(
     http("Submit Review")
-      .post("/review")
+      .put("/review")
       .body(StringBody("""{
+      "review": {
         "uuid": "${uuid}",
         "name": "${name}",
         "review-text": "${review-text}"
+      },
+      "token": ""
       }"""))
       .check(status.is(200))
   )
@@ -85,5 +88,7 @@ class BasicSimulation extends Simulation {
     reviewers.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
+  ).assertions(
+    global.successfulRequests.percent.is(100)
   )
 }
