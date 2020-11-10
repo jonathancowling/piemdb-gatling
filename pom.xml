@@ -6,7 +6,7 @@
   <version>1.0.0</version>
 
   <properties>
-      <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.release>11</maven.compiler.release>
   </properties>
 
   <dependencies>
@@ -26,14 +26,9 @@
         <version>4.4.0</version>
         <executions>
           <execution>
-            <!-- <phase>test-compile</phase> -->
             <goals>
-              <!-- <goal>add-source</goal> -->
               <goal>testCompile</goal>
             </goals>
-            <!-- <configuration>
-              <testSourceDir>${project.basedir}/src/gatling/scala</testSourceDir>
-            </configuration> -->
           </execution>
         </executions>
       </plugin>
@@ -42,11 +37,10 @@
         <artifactId>gatling-maven-plugin</artifactId>
         <version>3.1.0</version>
         <configuration>
-          <disableCompiler>true</disableCompiler>
-          <!-- <runMultipleSimulations>true</runMultipleSimulations>
           <includes>
-            <include>gatling</include>
-          </includes> -->
+            <include>gatling.*</include>
+          </includes>
+          <disableCompiler>true</disableCompiler>
         </configuration>
         <executions>
           <execution>
