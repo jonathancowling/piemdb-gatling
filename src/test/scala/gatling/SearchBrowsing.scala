@@ -10,7 +10,7 @@ sealed class UUIDValidator extends Validator[String] {
   private val regexMatch = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}".r
   override def apply(actual: Option[String], displayActualValue: Boolean): Validation[Option[String]] = {
     return actual match {
-      case `regexMatch` => Success(actual)
+      case Some(input) if regexMatch.pattern.matcher(input).matches => Success(actual)
       case _ => Failure(s"""string "$actual" is not a valid uuid""")
     }
   }
@@ -19,23 +19,15 @@ sealed class UUIDValidator extends Validator[String] {
 sealed class UUIDSeqValidator extends Validator[Seq[String]] {
   val name = "uuid regex seq"
   private val uuidValidator = new UUIDValidator
-  override def apply(actual: Option[Seq[String]], displayActualValue: Boolean): Validation[Option[String]] = {
+  override def apply(actual: Option[Seq[String]], displayActualValue: Boolean): Validation[Option[Seq[String]]] = {
     return  actual match {
-      case Some(uuidList) => 
-        val (successes, failures): (Seq[Some[String]], Seq[None]) = uuidList.map {
+      case Some(uuidList) =>
+        val (successes, failures): (Seq[Option[String]], Seq[Option[String]]) = uuidList.map {
           uuid => uuidValidator(Some(uuid), displayActualValue).toOption.flatten
         }.partition {
           it => it.isDefined
         }
-        if (failures.isEmpty) successes.success else "".failure
-      // .reduce(Success(Seq.empty)) { (acc, validation) =>
-      //   acc.map { seq =>
-      //     validation match {
-      //       case Success(uuid) => Success(seq + uuid)
-      //       case Failure => validation
-      //     }
-      //   }
-      // }
+        if (failures.isEmpty) Some(successes.map(_.get)).success else "".failure
       case None => "No items in sequence".failure
     }
   }
@@ -68,17 +60,14 @@ sealed class UUIDSeqValidator extends Validator[Seq[String]] {
 
 object SearchBrowsing {
   private val searchData = Array(
-    Map("searchs" -> Array(
-        "pie",
-        "Leeds",
-        "veg",
-        "Not bad",
-        "Best pie",
-        "Tasty",
-        "Good service",
-        "Favourite",
-    ))
-  )
+    Map("search" -> "pie"),
+    Map("search" -> "Leeds"),
+    Map("search" -> "veg"),
+    Map("search" -> "Not bad"),
+    Map("search" -> "Tasty"),
+    Map("search" -> "Good service"),
+    Map("search" -> "Favourite"),
+  ).random
   private val reviewsData = Array(
     Map(
       "name" -> "some review",
@@ -86,7 +75,7 @@ object SearchBrowsing {
     )
   )
 
-  val review = exec(
+  val browse = exec(
     http("Home")
       .get("/randomPie")
       .check(
@@ -96,7 +85,6 @@ object SearchBrowsing {
   )
   .pause(1)
   .feed(searchData)
-  .exec { session => session.set("search", session("${searchs.random()}").as[String]) }
   .exec(
     http("Search")
       .get("/search/${search}")
@@ -107,6 +95,7 @@ object SearchBrowsing {
         jsonPath("$[*]").findAll.validate(new UUIDSeqValidator)
       )
   )
+  .exec { session => println(session); session }
   .repeat(3) {
     exitHereIfFailed
     .foreach(
@@ -119,14 +108,6 @@ object SearchBrowsing {
           .check(
             status.is(200),
             jsonPath("$.uuid").validate(new UUIDValidator),
-            jsonPath("$.name").ofType[String],
-            jsonPath("$.description").ofType[String],
-            jsonPath("$.date-posted").ofType[String],
-            jsonPath("$.location").ofType[String],
-            jsonPath("$.establishment").ofType[String],
-            jsonPath("$.cost").ofType[String],
-            jsonPath("$.recipe-link").ofType[String],
-            jsonPath("$.image").ofType[String]
           )
       )
     }
@@ -138,14 +119,6 @@ object SearchBrowsing {
         .check(
           status.in(200, 304),
           jsonPath("$.uuid").validate(new UUIDValidator),
-            jsonPath("$.name").ofType[String],
-            jsonPath("$.description").ofType[String],
-            jsonPath("$.date-posted").ofType[String],
-            jsonPath("$.location").ofType[String],
-            jsonPath("$.establishment").ofType[String],
-            jsonPath("$.cost").ofType[String],
-            jsonPath("$.recipe-link").ofType[String],
-            jsonPath("$.image").ofType[String]
         )
     )
   }

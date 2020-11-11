@@ -84,8 +84,12 @@ class BasicSimulation extends Simulation {
   val reviewers = scenario("Reviewers")
     .exec(ReviewingAPie.review)
 
+  val browsers = scenario("Browsers")
+    .exec(SearchBrowsing.browse)
+
   setUp(
-    reviewers.inject(atOnceUsers(1))
+    // reviewers.inject(atOnceUsers(1))
+    browsers.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   ).assertions(
