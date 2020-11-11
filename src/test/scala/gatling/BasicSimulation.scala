@@ -5,6 +5,9 @@ import java.{util => ju}
 import io.gatling.commons.validation.Validation
 import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
+import SubmitAPie.submit
+import ReadingReview.read
+import RandomPie.random 
 
 object ReviewingAPie {
   private val searchData = csv("gatling/data/search.csv")
@@ -60,61 +63,6 @@ object ReviewingAPie {
       .check(status.is(200))
   )
 }
-object SubmitAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val submitPie = Array(
-    Map(
-        "name" -> "Arman's Pie",
-        "description" -> "Signature pie from armans household",
-        "location" ->  "California"
-      )
-  )
-
-  val submit = exec(
-      http("Home")
-      .get("/randomPie")
-      .check(status.is(200))
-  )
-  .pause(1)
-  .feed(searchData)
-  .exec(
-    http("Search")
-      .get("/search/${search}")
-      .check(
-        status.is(200)
-      )
-  )
-  .exitHereIfFailed
-  .pause(3)
-  .feed(submitPie)
-  .exec(
-    http("Submit a Pie")
-      .put("/submitPie")
-      .body(StringBody("""{
-        "pieData": {
-          "name": "${name}",
-          "descritpion": "${description}",
-          "location": "${location}"
-        },
-        "token": "anything"
-      }
-      """))
-      .check(
-        status.is(200),
-        jsonPath("$").exists,
-        jsonPath("$").saveAs("uuid")
-      )
-  )
-  .pause(2)
-  .exitHereIfFailed
-  .exec(
-    http("Get submitted pie")
-      .get("/pie/${uuid}")
-      .check(status.is(200))
-  )
-}
 
 class BasicSimulation extends Simulation {
 
@@ -138,9 +86,16 @@ class BasicSimulation extends Simulation {
   val submit = scenario("Submit")
     .exec(SubmitAPie.submit)
 
+  val readReview = scenario("Reading")
+    .exec(ReadingReview.read)
+
+  val randomPie = scenario("Random")
+    .exec(repeat(2) {RandomPie.random})
   setUp(
     reviewers.inject(atOnceUsers(1)),
-    submit.inject(atOnceUsers(1))
+    submit.inject(atOnceUsers(1)),
+    readReview.inject(atOnceUsers(1)),
+    randomPie.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   ).assertions(
