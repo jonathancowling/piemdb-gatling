@@ -153,6 +153,26 @@ object ReadingReview {
       .check(status.is(200))
   )
 }
+object RandomPie {
+  val random = exec(
+      http("Home")
+      .get("/randomPie")
+      .check(
+        status.is(200),
+        jsonPath("$").count.gt(0),
+        jsonPath("$").saveAs("uuid")
+      )
+  )
+  .exitHereIfFailed
+  .pause(2)
+  .exec(
+    http("Go to Random Pie Page")
+      .get("/pie/${uuid}")
+      .check(status.is(200))
+  )
+
+}
+
 class BasicSimulation extends Simulation {
 
   val properties = new ju.Properties()
@@ -178,10 +198,13 @@ class BasicSimulation extends Simulation {
   val readReview = scenario("Reading")
     .exec(ReadingReview.read)
 
+  val randomPie = scenario("Random")
+    .exec(repeat(2) {RandomPie.random})
   setUp(
     reviewers.inject(atOnceUsers(1)),
     submit.inject(atOnceUsers(1)),
-    readReview.inject(atOnceUsers(1))
+    readReview.inject(atOnceUsers(1)),
+    randomPie.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   )
