@@ -104,7 +104,7 @@ object SubmitAPie {
       """))
       .check(
         status.is(200),
-        jsonPath("$").count.gt(0),
+        jsonPath("$").exists,
         jsonPath("$").saveAs("uuid")
       )
   )
