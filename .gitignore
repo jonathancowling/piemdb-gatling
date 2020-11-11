@@ -5,3 +5,4 @@
 /.vscode
 /.classpath
 /.project
+/src/test/resources/gatling/gatling.properties

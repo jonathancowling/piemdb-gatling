@@ -2,17 +2,16 @@ package gatling
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import java.{util => ju}
+import io.gatling.commons.validation.Validation
+import io.gatling.core.check.Validator
+import io.gatling.commons.validation._
+import SubmitAPie.submit
+import ReadingReview.read
+import RandomPie.random 
 
 object ReviewingAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val reviewsData = Array(
-    Map(
-      "name" -> "some review",
-      "review-text" -> "this pie is awesome"
-    )
-  )
+  private val searchData = csv("gatling/data/search.csv")
+  private val reviewsData = csv("gatling/data/reviews.csv")
 
   val review = exec(
     http("Home")
@@ -20,14 +19,14 @@ object ReviewingAPie {
       .check(status.is(200))
   )
   .pause(1)
-  .feed(searchData)
+  .feed(searchData.random.circular)
   .exec(
     http("Search")
       .get("/search/${search}")
       .check(
         status.is(200),
         jsonPath("$[*]").count.gt(0),
-        jsonPath("$[*]").findAll.saveAs("uuids") // FIXME
+        jsonPath("$[*]").findAll.saveAs("uuids")
       )
   )
   .exitHereIfFailed
@@ -46,131 +45,23 @@ object ReviewingAPie {
   .exec(
     http("Get Chosen Pie")
       .get("/pie/${uuid}")
-      .check(status.is(200))
+      .check(status.in(200, 304))
   )
   .pause(3)
   .feed(reviewsData.random.circular)
   .exec(
     http("Submit Review")
-      .post("/review")
+      .put("/review")
       .body(StringBody("""{
+      "review": {
         "uuid": "${uuid}",
         "name": "${name}",
         "review-text": "${review-text}"
+      },
+      "token": ""
       }"""))
       .check(status.is(200))
   )
-}
-object SubmitAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val submitPie = Array(
-    Map(
-        "name" -> "Arman's Pie",
-        "description" -> "Signature pie from armans household",
-        "location" ->  "California"
-      )
-  )
-
-  val submit = exec(
-      http("Home")
-      .get("/randomPie")
-      .check(status.is(200))
-  )
-  .pause(1)
-  .feed(searchData)
-  .exec(
-    http("Search")
-      .get("/search/${search}")
-      .check(
-        status.is(200)
-      )
-  )
-  .exitHereIfFailed
-  .pause(3)
-  .feed(submitPie)
-  .exec(
-    http("Submit a Pie")
-      .put("/submitPie")
-      .body(StringBody("""{
-        "pieData": {
-          "name": "${name}",
-          "descritpion": "${description}",
-          "location": "${location}"
-        },
-        "token": "anything"
-      }
-      """))
-      .check(
-        status.is(200),
-        jsonPath("$").count.gt(0),
-        jsonPath("$").saveAs("uuid")
-      )
-  )
-  .pause(2)
-  .exitHereIfFailed
-  .exec(
-    http("Get submitted pie")
-      .get("/pie/${uuid}")
-      .check(status.is(200))
-  )
-}
-object ReadingReview {
-   private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  val read = exec(
-      http("Home")
-      .get("/randomPie")
-      .check(status.is(200))
-  )
-  .pause(3)
-  .feed(searchData)
-  .exec(
-    http("Search")
-      .get("/search/${search}")
-      .check(
-        status.is(200),
-        jsonPath("$[*]").count.gt(0),
-        jsonPath("$[*]").findAll.saveAs("uuids")
-      )
-  )
-  .exitHereIfFailed
-  .foreach(
-    "${uuids}",
-    "uuid"
-  ) {
-    exec(
-      http("Get pie")
-        .get("/pie/${uuid}")
-        .check(status.is(200))
-    )
-  }
-  .exec(
-    http("Get review")
-      .get("/review/${uuid}")
-      .check(status.is(200))
-  )
-}
-object RandomPie {
-  val random = exec(
-      http("Home")
-      .get("/randomPie")
-      .check(
-        status.is(200),
-        jsonPath("$").count.gt(0),
-        jsonPath("$").saveAs("uuid")
-      )
-  )
-  .exitHereIfFailed
-  .pause(2)
-  .exec(
-    http("Go to Random Pie Page")
-      .get("/pie/${uuid}")
-      .check(status.is(200))
-  )
-
 }
 
 class BasicSimulation extends Simulation {
@@ -207,5 +98,7 @@ class BasicSimulation extends Simulation {
     randomPie.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
+  ).assertions(
+    global.successfulRequests.percent.is(100)
   )
 }
