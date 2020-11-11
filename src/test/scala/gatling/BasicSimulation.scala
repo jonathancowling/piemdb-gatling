@@ -61,6 +61,61 @@ object ReviewingAPie {
       .check(status.is(200))
   )
 }
+object SubmitAPie {
+  private val searchData = Array(
+    Map("search" -> "pie")
+  )
+  private val submitPie = Array(
+    Map(
+        "name" -> "Arman's Pie",
+        "description" -> "Signature pie from armans household",
+        "location" ->  "California"
+      )
+  )
+
+  val submit = exec(
+      http("Home")
+      .get("/randomPie")
+      .check(status.is(200))
+  )
+  .pause(1)
+  .feed(searchData)
+  .exec(
+    http("Search")
+      .get("/search/${search}")
+      .check(
+        status.is(200)
+      )
+  )
+  .exitHereIfFailed
+  .pause(3)
+  .feed(submitPie)
+  .exec(
+    http("Submit a Pie")
+      .put("/submitPie")
+      .body(StringBody("""{
+        "pieData": {
+          "name": "${name}",
+          "descritpion": "${description}",
+          "location": "${location}"
+        },
+        "token": "anything"
+      }
+      """))
+      .check(
+        status.is(200),
+        jsonPath("$").count.gt(0),
+        jsonPath("$").saveAs("uuid")
+      )
+  )
+  .pause(3)
+  .exitHereIfFailed
+  .exec(
+    http("Get submitted pie")
+      .get("/pie/${uuid}")
+      .check(status.is(200))
+  )
+}
 
 class BasicSimulation extends Simulation {
 
@@ -80,9 +135,13 @@ class BasicSimulation extends Simulation {
 
   val reviewers = scenario("Reviewers")
     .exec(ReviewingAPie.review)
+  
+  val submit = scenario("Submit")
+    .exec(SubmitAPie.submit)
 
   setUp(
-    reviewers.inject(atOnceUsers(1))
+    reviewers.inject(atOnceUsers(1)),
+    submit.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   )
