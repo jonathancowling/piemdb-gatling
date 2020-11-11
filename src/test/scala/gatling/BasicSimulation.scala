@@ -125,7 +125,7 @@ object ReadingReview {
       .get("/randomPie")
       .check(status.is(200))
   )
-  .pause(2)
+  .pause(3)
   .feed(searchData)
   .exec(
     http("Search")
