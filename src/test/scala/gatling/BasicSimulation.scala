@@ -2,17 +2,13 @@ package gatling
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import java.{util => ju}
+import io.gatling.commons.validation.Validation
+import io.gatling.core.check.Validator
+import io.gatling.commons.validation._
 
 object ReviewingAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val reviewsData = Array(
-    Map(
-      "name" -> "some review",
-      "review-text" -> "this pie is awesome"
-    )
-  )
+  private val searchData = csv("gatling/data/search.csv")
+  private val reviewsData = csv("gatling/data/reviews.csv")
 
   val review = exec(
     http("Home")
@@ -20,7 +16,7 @@ object ReviewingAPie {
       .check(status.is(200))
   )
   .pause(1)
-  .feed(searchData)
+  .feed(searchData.random.circular)
   .exec(
     http("Search")
       .get("/search/${search}")
