@@ -108,7 +108,7 @@ object SubmitAPie {
         jsonPath("$").saveAs("uuid")
       )
   )
-  .pause(3)
+  .pause(2)
   .exitHereIfFailed
   .exec(
     http("Get submitted pie")
