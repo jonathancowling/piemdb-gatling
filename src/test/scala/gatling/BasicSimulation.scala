@@ -116,7 +116,43 @@ object SubmitAPie {
       .check(status.is(200))
   )
 }
-
+object ReadingReview {
+   private val searchData = Array(
+    Map("search" -> "pie")
+  )
+  val read = exec(
+      http("Home")
+      .get("/randomPie")
+      .check(status.is(200))
+  )
+  .pause(2)
+  .feed(searchData)
+  .exec(
+    http("Search")
+      .get("/search/${search}")
+      .check(
+        status.is(200),
+        jsonPath("$[*]").count.gt(0),
+        jsonPath("$[*]").findAll.saveAs("uuids")
+      )
+  )
+  .exitHereIfFailed
+  .foreach(
+    "${uuids}",
+    "uuid"
+  ) {
+    exec(
+      http("Get pie")
+        .get("/pie/${uuid}")
+        .check(status.is(200))
+    )
+  }
+  .exec(
+    http("Get review")
+      .get("/review/${uuid}")
+      .check(status.is(200))
+  )
+}
 class BasicSimulation extends Simulation {
 
   val properties = new ju.Properties()
@@ -139,9 +175,13 @@ class BasicSimulation extends Simulation {
   val submit = scenario("Submit")
     .exec(SubmitAPie.submit)
 
+  val readReview = scenario("Reading")
+    .exec(ReadingReview.read)
+
   setUp(
     reviewers.inject(atOnceUsers(1)),
-    submit.inject(atOnceUsers(1))
+    submit.inject(atOnceUsers(1)),
+    readReview.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   )
