@@ -3,65 +3,14 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import java.{util => ju}
 
-object ReviewingAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val reviewsData = Array(
-    Map(
-      "name" -> "some review",
-      "review-text" -> "this pie is awesome"
-    )
-  )
-
-  val review = exec(
+object GoHome { 
+  val getRandom = exec(
     http("Home")
-      .get("/randomPie")
-      .check(status.is(200))
-  )
-  .pause(1)
-  .feed(searchData)
-  .exec(
-    http("Search")
-      .get("/search/${search}")
-      .check(
-        status.is(200),
-        jsonPath("$[*]").count.gt(0),
-        jsonPath("$[*]").findAll.saveAs("uuids")
-      )
-  )
-  .exitHereIfFailed
-  .foreach(
-    "${uuids}",
-    "uuid"
-  ) {
-    exec(
-      http("Get Pie")
-        .get("/pie/${uuid}")
-        .check(status.is(200))
+    .get("/randomPie")
+    .check(
+      status.is(200),
+      jsonPath("$").validate(new UUIDValidator)
     )
-  }
-  .pause(3)
-  .exec { session => session.set("uuid", session("${uuids.random()}").as[String]) }
-  .exec(
-    http("Get Chosen Pie")
-      .get("/pie/${uuid}")
-      .check(status.in(200, 304))
-  )
-  .pause(3)
-  .feed(reviewsData.random.circular)
-  .exec(
-    http("Submit Review")
-      .put("/review")
-      .body(StringBody("""{
-      "review": {
-        "uuid": "${uuid}",
-        "name": "${name}",
-        "review-text": "${review-text}"
-      },
-      "token": ""
-      }"""))
-      .check(status.is(200))
   )
 }
 
@@ -82,14 +31,20 @@ class BasicSimulation extends Simulation {
     .acceptHeader("application/json")
 
   val reviewers = scenario("Reviewers")
+    .exec(GoHome.getRandom)
+    .pause(1)
     .exec(ReviewingAPie.review)
 
   val browsers = scenario("Browsers")
-    .exec(SearchBrowsing.browse)
+    .exec(GoHome.getRandom)
+    .pause(1)
+    .repeat(3) {
+      exec(SearchBrowsing.browse)
+    }
 
   setUp(
-    // reviewers.inject(atOnceUsers(1))
-    browsers.inject(atOnceUsers(1))
+    reviewers.inject(atOnceUsers(1))
+    // browsers.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   ).assertions(
