@@ -2,6 +2,12 @@ package gatling
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import java.{util => ju}
+import io.gatling.commons.validation.Validation
+import io.gatling.core.check.Validator
+import io.gatling.commons.validation._
+import SubmitAPie.submit
+import ReadingReview.read
+import RandomPie.random 
 
 object GoHome { 
   val getRandom = exec(
@@ -34,6 +40,9 @@ class BasicSimulation extends Simulation {
     .exec(GoHome.getRandom)
     .pause(1)
     .exec(ReviewingAPie.review)
+  
+  val submit = scenario("Submit")
+    .exec(SubmitAPie.submit)
 
   val browsers = scenario("Browsers")
     .exec(GoHome.getRandom)
@@ -42,9 +51,17 @@ class BasicSimulation extends Simulation {
       exec(SearchBrowsing.browse)
     }
 
+  val readReview = scenario("Reading")
+    .exec(ReadingReview.read)
+
+  val randomPie = scenario("Random")
+    .exec(repeat(2) {RandomPie.random})
+
   setUp(
-    reviewers.inject(atOnceUsers(1))
-    // browsers.inject(atOnceUsers(1))
+    reviewers.inject(atOnceUsers(1)),
+    submit.inject(atOnceUsers(1)),
+    readReview.inject(atOnceUsers(1)),
+    randomPie.inject(atOnceUsers(1))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   ).assertions(
