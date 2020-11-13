@@ -23,5 +23,4 @@ object RandomPie {
       .get("/pie/${uuid}")
       .check(status.is(200))
   )
-
 }
