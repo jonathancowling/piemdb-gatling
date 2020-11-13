@@ -7,34 +7,10 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 
 object SubmitAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val submitPie = Array(
-    Map(
-        "name" -> "Arman's Pie",
-        "description" -> "Signature pie from armans household",
-        "location" ->  "California"
-      )
-  )
+  private val submitPie = csv("gatling/data/pies.csv").circular
 
   val submit = exec(
-      http("Home")
-      .get("/randomPie")
-      .check(status.is(200))
-  )
-  .pause(1)
-  .feed(searchData)
-  .exec(
-    http("Search")
-      .get("/search/${search}")
-      .check(
-        status.is(200)
-      )
-  )
-  .exitHereIfFailed
-  .pause(3)
-  .feed(submitPie)
+  feed(submitPie)
   .exec(
     http("Submit a Pie")
       .put("/submitPie")
@@ -42,22 +18,31 @@ object SubmitAPie {
         "pieData": {
           "name": "${name}",
           "descritpion": "${description}",
-          "location": "${location}"
+          "location": "${location}",
+          "image": "${image}"
         },
         "token": "anything"
       }
       """))
       .check(
         status.is(200),
-        jsonPath("$").exists,
+        jsonPath("$").validate(new UUIDValidator),
         jsonPath("$").saveAs("uuid")
       )
   )
-  .pause(2)
   .exitHereIfFailed
   .exec(
     http("Get submitted pie")
       .get("/pie/${uuid}")
-      .check(status.is(200))
+      .check(
+        status.is(200),
+        jsonPath("$.uuid").validate(new UUIDValidator)
+      )
+    )
+    .exec(
+    http("Get reviews")
+      .get("/review/${uuid}")
+      .check(status.in(200, 304))
+    )
   )
 }

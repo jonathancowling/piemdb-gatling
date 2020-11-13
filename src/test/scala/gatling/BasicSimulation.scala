@@ -7,60 +7,16 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 import SubmitAPie.submit
 import ReadingReview.read
-import RandomPie.random 
+import RandomPie.random
 
-object ReviewingAPie {
-  private val searchData = csv("gatling/data/search.csv")
-  private val reviewsData = csv("gatling/data/reviews.csv")
-
-  val review = exec(
+object GoHome { 
+  val getRandom = exec(
     http("Home")
-      .get("/randomPie")
-      .check(status.is(200))
-  )
-  .pause(1)
-  .feed(searchData.random.circular)
-  .exec(
-    http("Search")
-      .get("/search/${search}")
-      .check(
-        status.is(200),
-        jsonPath("$[*]").count.gt(0),
-        jsonPath("$[*]").findAll.saveAs("uuids")
-      )
-  )
-  .exitHereIfFailed
-  .foreach(
-    "${uuids}",
-    "uuid"
-  ) {
-    exec(
-      http("Get Pie")
-        .get("/pie/${uuid}")
-        .check(status.is(200))
+    .get("/randomPie")
+    .check(
+      status.is(200),
+      jsonPath("$").validate(new UUIDValidator)
     )
-  }
-  .pause(3)
-  .exec { session => session.set("uuid", session("${uuids.random()}").as[String]) }
-  .exec(
-    http("Get Chosen Pie")
-      .get("/pie/${uuid}")
-      .check(status.in(200, 304))
-  )
-  .pause(3)
-  .feed(reviewsData.random.circular)
-  .exec(
-    http("Submit Review")
-      .put("/review")
-      .body(StringBody("""{
-      "review": {
-        "uuid": "${uuid}",
-        "name": "${name}",
-        "review-text": "${review-text}"
-      },
-      "token": ""
-      }"""))
-      .check(status.is(200))
   )
 }
 
@@ -81,16 +37,28 @@ class BasicSimulation extends Simulation {
     .acceptHeader("application/json")
 
   val reviewers = scenario("Reviewers")
+    .exec(GoHome.getRandom)
+    .pause(1)
     .exec(ReviewingAPie.review)
   
   val submit = scenario("Submit")
+    .exec(GoHome.getRandom)
+    .pause(1)
     .exec(SubmitAPie.submit)
 
+  val browsers = scenario("Browsers")
+    .exec(GoHome.getRandom)
+    .pause(1)
+    .exec(repeat(3) {SearchBrowsing.browse})
+
   val readReview = scenario("Reading")
-    .exec(ReadingReview.read)
+    .exec(GoHome.getRandom)
+    .pause(1)
+    .exec(repeat(3) {ReadingReview.read})
 
   val randomPie = scenario("Random")
-    .exec(repeat(2) {RandomPie.random})
+    .exec(repeat(3) {RandomPie.random})
+
   setUp(
     reviewers.inject(atOnceUsers(1)),
     submit.inject(atOnceUsers(1)),

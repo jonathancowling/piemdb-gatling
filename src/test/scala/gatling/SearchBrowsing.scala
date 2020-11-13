@@ -1,16 +1,14 @@
 package gatling
+import scala.util.Random
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import java.{util => ju}
-import io.gatling.commons.validation.Validation
-import io.gatling.core.check.Validator
-import io.gatling.commons.validation._
-import scala.util.Random
+import gatling.utils.debug
 
-object ReadingReview {
+object SearchBrowsing {
   private val searchData = csv("gatling/data/search.csv").circular
 
-  val read = exec(
+  val browse =
   feed(searchData)
   .exec(
     http("Search")
@@ -18,8 +16,8 @@ object ReadingReview {
       .check(
         status.in(200, 304),
         jsonPath("$[*]").count.gt(0),
-        jsonPath("$[*]").findAll.validate(new UUIDSeqValidator),
-        jsonPath("$[*]").findAll.saveAs("uuids")
+        jsonPath("$[*]").findAll.saveAs("uuids"),
+        jsonPath("$[*]").findAll.validate(new UUIDSeqValidator)
       )
   )
   .exitHereIfFailed
@@ -28,7 +26,7 @@ object ReadingReview {
     "uuid"
   ) {
     exec(
-      http("Get pie")
+      http("Get Pies")
         .get("/pie/${uuid}")
         .check(
           status.in(200, 304),
@@ -36,8 +34,9 @@ object ReadingReview {
         )
     )
   }
-  .pause(3) // time to choose a pie
+  .pause(3)
   .exec { session => session.set("uuid", Random.shuffle(session("uuids").as[Seq[String]]).head) }
+  .exitHereIfFailed
   .exec(
     http("Get Chosen Pie")
       .get("/pie/${uuid}")
@@ -47,9 +46,8 @@ object ReadingReview {
       )
   )
   .exec(
-    http("Get review")
+    http("Get Reviews for Chosen Pie")
       .get("/review/${uuid}")
       .check(status.in(200, 304))
-    )
-  )
+  )  
 }
