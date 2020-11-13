@@ -1,0 +1,45 @@
+service: piemdb-index-builder
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs12.x
+  environment:
+    NODE_ENV: ${opt:stage, 'test'}
+    REGION: ${env:REGION}
+  region: ${env:REGION}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource:
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}'
+    - Effect: Allow
+      Action:
+        - s3:ListBucket
+      Resource:
+        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}'
+    - Effect: Allow
+      Action:
+        - s3:*Object
+      Resource:
+        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+
+functions:
+  piemdb-index-builder:
+    handler: handler.handle
+    memorySize: 256
+    events:
+      - schedule: rate(10 minutes)
+    environment:
+      BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
+
+resources:
+  Resources:
+    SiteBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: piemdb-search-index-bucket-${self:provider.stage}

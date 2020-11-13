@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`/components/GlobalComponents/GlobalTextBox/GlobalTextBox.jsx snapshot should match for default values 1`] = `
+<div
+  className="MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth"
+  onKeyDown={[Function]}
+>
+  <div
+    className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline MuiOutlinedInput-multiline"
+    onClick={[Function]}
+  >
+    <textarea
+      aria-invalid={false}
+      autoFocus={false}
+      className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiOutlinedInput-inputMultiline"
+      data-testid="test-box"
+      disabled={false}
+      id="test-box-id"
+      onAnimationStart={[Function]}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      required={false}
+      rows={1}
+    />
+    <fieldset
+      aria-hidden={true}
+      className="PrivateNotchedOutline-root-9 MuiOutlinedInput-notchedOutline"
+      style={
+        Object {
+          "paddingLeft": 8,
+        }
+      }
+    >
+      <legend
+        className="PrivateNotchedOutline-legend-10"
+        style={
+          Object {
+            "width": 0.01,
+          }
+        }
+      >
+        <span
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "&#8203;",
+            }
+          }
+        />
+      </legend>
+    </fieldset>
+  </div>
+</div>
+`;
+
+exports[`/components/GlobalComponents/GlobalTextBox/GlobalTextBox.jsx snapshot should match for different than default values 1`] = `
+<div
+  className="MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth"
+  onKeyDown={[Function]}
+>
+  <label
+    className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+    data-shrink={true}
+    htmlFor="test-box-id"
+    id="test-box-id-label"
+  >
+    test-label
+  </label>
+  <div
+    className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline MuiOutlinedInput-multiline"
+    onClick={[Function]}
+  >
+    <textarea
+      aria-invalid={false}
+      autoFocus={false}
+      className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiOutlinedInput-inputMultiline"
+      data-testid="test-box"
+      disabled={false}
+      id="test-box-id"
+      onAnimationStart={[Function]}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      required={false}
+      rows={4}
+      value="Some text here"
+    />
+    <fieldset
+      aria-hidden={true}
+      className="PrivateNotchedOutline-root-9 MuiOutlinedInput-notchedOutline"
+    >
+      <legend
+        className="PrivateNotchedOutline-legendLabelled-11 PrivateNotchedOutline-legendNotched-12"
+      >
+        <span>
+          test-label
+        </span>
+      </legend>
+    </fieldset>
+  </div>
+</div>
+`;

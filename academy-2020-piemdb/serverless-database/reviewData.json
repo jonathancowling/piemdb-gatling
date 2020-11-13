@@ -1,0 +1,31 @@
+{
+    "PieMDB-database": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "uuid": {
+                        "S": "646b5325-a0e1-4e00-8cb1-bbf320953ac1"
+                    },
+                    "name": {
+                        "S": "Connor"
+                    },
+                    "week-posted": {
+                        "S": "2020-10-12"
+                    },
+                    "date-posted": {
+                        "S": "2020-10-15"
+                    },
+                    "rating": {
+                        "N": "4.5"
+                    },
+                    "review-text": {
+                        "S": "A reyt gud pie"
+                    },
+                    "sort-key": {
+                        "S": "REVIEW-3h4b5325-a0e1-4ea0-8cb1-bbf320jr7ac1"
+                    }
+                }
+            }
+        }
+    ]
+}

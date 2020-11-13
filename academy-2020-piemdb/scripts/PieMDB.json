@@ -1,0 +1,65 @@
+{
+  "ModelName": "PieMDB",
+  "ModelMetadata": {
+    "Author": "PieMDBTeam",
+    "DateCreated": "Oct 14, 2020, 11:45 AM",
+    "DateLastModified": "Oct 14, 2020, 12:00 PM",
+    "Description": "",
+    "Version": "1.0"
+  },
+  "DataModel": [
+    {
+      "TableName": "PieMDB-database",
+      "KeySchema": [
+        {
+          "AttributeName": "uuid",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "sort-key",
+          "KeyType": "RANGE"
+        }
+      ],
+      "AttributeDefinitions": [
+        {
+          "AttributeName": "week-posted",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "uuid",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "sort-key",
+          "AttributeType": "S"
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "find-by-week",
+          "KeySchema": [
+            {
+              "AttributeName": "week-posted",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "uuid",
+              "KeyType": "RANGE"
+            }
+          ],
+          "Projection": {
+            "ProjectionType": "KEYS_ONLY"
+          },
+          "ProvisionedThroughput": {
+            "ReadCapacityUnits": 10,
+            "WriteCapacityUnits": 10
+          }
+        }
+      ],
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 10,
+        "WriteCapacityUnits": 10
+      }
+    }
+  ]
+}
