@@ -36,7 +36,7 @@ sealed class UUIDSeqValidator extends Validator[Seq[String]] {
 }
 
 object SearchBrowsing {
-  private val searchData = csv("gatling/data/search.csv").random
+  private val searchData = csv("gatling/data/search.csv").circular
 
   val browse =
   feed(searchData)

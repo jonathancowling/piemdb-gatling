@@ -7,8 +7,8 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 
 object SubmitAPie {
-  private val searchData = csv("gatling/data/search.csv")
-  private val submitPie = csv("gatling/data/pies.csv")
+  private val searchData = csv("gatling/data/search.csv").circular
+  private val submitPie = csv("gatling/data/pies.csv").circular
 
   val submit = exec(
       http("Home")

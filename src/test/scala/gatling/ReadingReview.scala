@@ -7,7 +7,7 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 
 object ReadingReview {
-  private val searchData = csv("gatling/data/search.csv")
+  private val searchData = csv("gatling/data/search.csv").circular
 
   val read = exec(
       http("Home")

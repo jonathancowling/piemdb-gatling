@@ -4,8 +4,8 @@ import io.gatling.http.Predef._
 import scala.util.Random
 
 object ReviewingAPie {
-  private val searchData = csv("gatling/data/search.csv")
-  private val reviewsData = csv("gatling/data/reviews.csv")
+  private val searchData = csv("gatling/data/search.csv").circular
+  private val reviewsData = csv("gatling/data/reviews.csv").circular
 
   val review = exec(
     feed(searchData)
