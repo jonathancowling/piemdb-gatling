@@ -10,13 +10,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: compile
         working-directory: gatling
-        run: mvn test-compile
+        run: mvn test-compile --no-transfer-progress
 
       - name: scalastyle
         working-directory: gatling
-        run: mvn scalastyle:check
+        run: mvn scalastyle:check --no-transfer-progress
       
       - name: scalafix
         working-directory: gatling
-        run: mvn scalafix:scalafix
+        run: mvn scalafix:scalafix --no-transfer-progress
         
