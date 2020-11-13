@@ -23,17 +23,17 @@ jobs:
       
       - name: build app
         working-directory: academy-2020-piemdb/app
-        run: npm run build-prod
+        run: npm run build-test
         
       - name: deploy api and app to AWS
         working-directory: academy-2020-piemdb/app-api
         env: 
           RECAPTCHA_KEY: ${{ secrets.RECAPTCHA_KEY }} 
-        run: npx sls deploy
+        run: NODE_ENV=test npx sls deploy
         
       - name: deploy index-builder to AWS
         working-directory: academy-2020-piemdb/index-builder
-        run: npx sls deploy
+        run: NODE_ENV=test npx sls deploy
 
   deploy-database:
       if: github.event.base_ref == 'refs/heads/master'
@@ -54,4 +54,4 @@ jobs:
       
       - name: deploy to dynamo
         working-directory: academy-2020-piemdb/serverless-database
-        run: npx sls deploy
+        run: NODE_ENV=test npx sls deploy

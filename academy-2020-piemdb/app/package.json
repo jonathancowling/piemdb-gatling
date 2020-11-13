@@ -5,6 +5,7 @@
   "main": "dist/index.html",
   "scripts": {
     "start": "NODE_ENV=dev npx parcel serve index.html",
+    "build-test": "NODE_ENV=test npx parcel build index.html",
     "build-prod": "NODE_ENV=prod npx parcel build index.html",
     "build-dev": "NODE_ENV=dev npx parcel build index.html",
     "test": "npx jest --coverage"

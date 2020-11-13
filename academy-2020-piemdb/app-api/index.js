@@ -25,6 +25,8 @@ const { checkReview } = require('./checkingFunctions/checkReview');
 app.use(cors({ origin: true }));
 app.use(express.json());
 
+const stage = process.env.NODE_ENV;
+
 app.get('/pie/:id', async (req, res) => {
   const { id } = req.params;
   const pie = await getPieById(id);
@@ -47,7 +49,7 @@ app.put('/review', async (req, res) => {
   // check for re-captcha validity
   const { token } = req.body;
   const captureResponse = await validateRecapture(token);
-  if (!captureResponse && process.env.NODE_ENV === 'prod') {
+  if (!captureResponse && stage === 'prod') {
     res.status(400).json('Failed captcha, please retry');
     return;
   }
@@ -93,7 +95,7 @@ app.put('/submitPie', async (req, res) => {
 
   const { token } = req.body;
   const captureResponse = await validateRecapture(token);
-  if (!captureResponse && process.env.NODE_ENV === 'prod') {
+  if (!captureResponse && stage === 'prod') {
     res.status(400).json('Failed captcha, please retry');
     return;
   }
@@ -119,7 +121,6 @@ app.get('/search/:query', async (req, res) => {
   const { query } = req.params;
   const searchTerms = query.split(' ').map((t) => `${t}~1`).join(' ');
   console.info(`Search terms: ${searchTerms}`);
-  const stage = process.env.NODE_ENV;
   // Load index
   let data;
   // will run on prod/test bucket if the env var is defined
@@ -145,9 +146,9 @@ app.use((req, res) => {
 envVarChecker();
 
 /* istanbul ignore next  */
-if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'prod') {
+if (stage !== 'test' && stage !== 'prod') {
   app.listen(port, () => {
-    console.log(`PieMDB app-api listening at port ${port} on ${process.env.NODE_ENV}`);
+    console.log(`PieMDB app-api listening at port ${port} on ${stage}`);
   });
 }
 
