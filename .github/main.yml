@@ -6,6 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install all node modules
+        working-directory: academy-2020-piemdb
         run: ./getToThaChoppa.sh
         
       - name: Run linter on app
