@@ -7,7 +7,7 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 import SubmitAPie.submit
 import ReadingReview.read
-import RandomPie.random 
+import RandomPie.random
 
 object GoHome { 
   val getRandom = exec(
@@ -42,20 +42,22 @@ class BasicSimulation extends Simulation {
     .exec(ReviewingAPie.review)
   
   val submit = scenario("Submit")
+    .exec(GoHome.getRandom)
+    .pause(1)
     .exec(SubmitAPie.submit)
 
   val browsers = scenario("Browsers")
     .exec(GoHome.getRandom)
     .pause(1)
-    .repeat(3) {
-      exec(SearchBrowsing.browse)
-    }
+    .exec(repeat(3) {SearchBrowsing.browse})
 
   val readReview = scenario("Reading")
-    .exec(ReadingReview.read)
+    .exec(GoHome.getRandom)
+    .pause(1)
+    .exec(repeat(3) {ReadingReview.read})
 
   val randomPie = scenario("Random")
-    .exec(repeat(2) {RandomPie.random})
+    .exec(repeat(3) {RandomPie.random})
 
   setUp(
     reviewers.inject(atOnceUsers(1)),

@@ -11,8 +11,8 @@ object RandomPie {
       http("Home")
       .get("/randomPie")
       .check(
-        status.is(200),
-        jsonPath("$").count.gt(0),
+        status.in(200, 304),
+        jsonPath("$").validate(new UUIDValidator),
         jsonPath("$").saveAs("uuid")
       )
   )
@@ -21,6 +21,14 @@ object RandomPie {
   .exec(
     http("Go to Random Pie Page")
       .get("/pie/${uuid}")
-      .check(status.is(200))
+      .check(
+        status.in(200, 304),
+        jsonPath("$.uuid").validate(new UUIDValidator)
+      )
   )
+  .exec(
+    http("Get reviews")
+      .get("/review/${uuid}")
+      .check(status.in(200, 304))
+    )
 }

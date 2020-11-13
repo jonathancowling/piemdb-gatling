@@ -5,7 +5,7 @@ import scala.util.Random
 
 object ReviewingAPie {
   private val searchData = csv("gatling/data/search.csv").circular
-  private val reviewsData = csv("gatling/data/reviews.csv").circular
+  private val reviewsData = csv("gatling/data/reviews.csv").random.circular
 
   val review = exec(
     feed(searchData)
@@ -13,8 +13,9 @@ object ReviewingAPie {
       http("Search")
         .get("/search/${search}")
         .check(
-          status.is(200),
+          status.in(200, 304),
           jsonPath("$[*]").count.gt(0),
+          jsonPath("$[*]").findAll.validate(new UUIDSeqValidator),
           jsonPath("$[*]").findAll.saveAs("uuids")
         )
     )
@@ -26,7 +27,10 @@ object ReviewingAPie {
       exec(
         http("Get Pie")
           .get("/pie/${uuid}")
-          .check(status.is(200))
+          .check(
+            status.in(200, 304),
+            jsonPath("$.uuid").validate(new UUIDValidator)
+          )
       )
     }
     .pause(3)
@@ -34,10 +38,18 @@ object ReviewingAPie {
     .exec(
       http("Get Chosen Pie")
         .get("/pie/${uuid}")
-        .check(status.in(200, 304))
+        .check(
+          status.in(200, 304),
+          jsonPath("$.uuid").validate(new UUIDValidator)
+        )
+    )
+    .exec(
+    http("Get reviews")
+      .get("/review/${uuid}")
+      .check(status.in(200, 304))
     )
     .pause(3)
-    .feed(reviewsData.random.circular)
+    .feed(reviewsData)
     .exec(
       http("Submit Review")
         .put("/review")
@@ -49,7 +61,7 @@ object ReviewingAPie {
         },
         "token": ""
         }"""))
-        .check(status.is(200))
+        .check(status.in(200, 304))
     )
   )
 }
