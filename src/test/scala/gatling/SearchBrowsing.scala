@@ -36,15 +36,7 @@ sealed class UUIDSeqValidator extends Validator[Seq[String]] {
 }
 
 object SearchBrowsing {
-  private val searchData = Array(
-    Map("search" -> "pie"),
-    Map("search" -> "Leeds"),
-    Map("search" -> "veg"),
-    Map("search" -> "Not bad"),
-    Map("search" -> "Tasty"),
-    Map("search" -> "Good service"),
-    Map("search" -> "Favourite"),
-  ).random
+  private val searchData = csv("gatling/data/search.csv").random
 
   val browse =
   feed(searchData)

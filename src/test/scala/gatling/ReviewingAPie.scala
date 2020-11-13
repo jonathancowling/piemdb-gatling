@@ -4,15 +4,8 @@ import io.gatling.http.Predef._
 import scala.util.Random
 
 object ReviewingAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val reviewsData = Array(
-    Map(
-      "name" -> "some review",
-      "review-text" -> "this pie is awesome"
-    )
-  )
+  private val searchData = csv("gatling/data/search.csv")
+  private val reviewsData = csv("gatling/data/reviews.csv")
 
   val review = exec(
     feed(searchData)

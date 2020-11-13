@@ -7,9 +7,8 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 
 object ReadingReview {
-   private val searchData = Array(
-    Map("search" -> "pie")
-  )
+  private val searchData = csv("gatling/data/search.csv")
+
   val read = exec(
       http("Home")
       .get("/randomPie")

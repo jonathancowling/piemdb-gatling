@@ -7,16 +7,8 @@ import io.gatling.core.check.Validator
 import io.gatling.commons.validation._
 
 object SubmitAPie {
-  private val searchData = Array(
-    Map("search" -> "pie")
-  )
-  private val submitPie = Array(
-    Map(
-        "name" -> "Arman's Pie",
-        "description" -> "Signature pie from armans household",
-        "location" ->  "California"
-      )
-  )
+  private val searchData = csv("gatling/data/search.csv")
+  private val submitPie = csv("gatling/data/pies.csv")
 
   val submit = exec(
       http("Home")
