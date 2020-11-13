@@ -1,0 +1,40 @@
+service: PieMDB-serverless-database
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs12.x
+  region: ${env:REGION}
+
+resources: 
+  Resources:
+    PieMDBServerlessDatabase:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        TableName: PieMDB-database-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: week-posted
+            AttributeType: S
+          - AttributeName: uuid
+            AttributeType: S
+          - AttributeName: sort-key
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
+          - AttributeName: sort-key
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: find-by-week
+            Projection: 
+              ProjectionType: KEYS_ONLY
+            KeySchema: 
+              - AttributeName: week-posted
+                KeyType: HASH
+              - AttributeName: uuid
+                KeyType: RANGE
+

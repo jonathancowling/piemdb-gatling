@@ -1,0 +1,81 @@
+service: PieMDB
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${env:REGION}
+  httpApi:
+    cors: true
+  environment:
+    NODE_ENV: ${opt:stage, 'test'}
+    REGION: ${env:REGION}
+    ENDPOINT: ${env:ENDPOINT}
+    RECAPTCHA_KEY: ${env:RECAPTCHA_KEY}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}/index/find-by-week'
+    - Effect: Allow
+      Action:
+        - s3:ListBucket
+      Resource:
+        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}'
+    - Effect: Allow
+      Action:
+        - s3:*Object
+      Resource:
+        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+
+functions:
+  piemdb-app-api:
+    handler: lambda.app_api
+    memorySize: 128
+    events:
+      - httpApi:
+          path: /{any+}
+          method: '*'
+    environment:
+      INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
+
+plugins:
+  - serverless-domain-manager
+  - serverless-s3-sync
+  
+custom:
+  customDomain:
+    domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
+    apiType: http
+    endpointType: regional
+    autoDomain: true
+  s3Sync:
+    - bucketName: piemdb.infinipie.works-${self:provider.stage}
+      localDir: ../app/dist
+      acl: public-read 
+
+resources:
+  Resources:
+    SiteBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: piemdb.infinipie.works-${self:provider.stage}
+        AccessControl: PublicRead
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET]
+              AllowedOrigins: ['*']
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
