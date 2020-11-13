@@ -1,0 +1,83 @@
+name: CI-CD
+on: push
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install all node modules
+        run: ./getToThaChoppa.sh
+        
+      - name: Run linter on app
+        working-directory: academy-2020-piemdb/app
+        run: ./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules --ignore-pattern dist
+      - name: Run linter on app-api
+        working-directory: academy-2020-piemdb/app-api
+        run: ./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules --ignore-pattern dist
+      - name: Run linter on index-builder
+        working-directory: academy-2020-piemdb/index-builder
+        run: ./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules --ignore-pattern dist
+
+      - name: Unit tests for api
+        working-directory: academy-2020-piemdb/app-api
+        run: npm test # npx jest --coverage
+      - name: Unit tests for app
+        working-directory: academy-2020-piemdb/app
+        run: npm test # npx jest --coverage
+      - name: Unit tests for index-builder
+        working-directory: academy-2020-piemdb/index-builder
+        run: npm test
+
+  # deploy-app-and-api:
+  #   needs: code-quality
+  #   if: github.ref == 'refs/heads/master'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+    
+  #   - name: Build app-api
+  #     working-directory: academy-2020-piemdb/app-api
+  #     run: npm install 
+    
+  #   - name: Configure AWS Credentials
+  #     uses: aws-actions/configure-aws-credentials@v1
+  #     with:
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws-region: eu-west-2
+    
+  #   - name: build app
+  #     working-directory: academy-2020-piemdb/app
+  #     run: npm run build-prod
+      
+  #   - name: deploy api and app to AWS
+  #     working-directory: academy-2020-piemdb/app-api
+  #     env: 
+  #       RECAPTCHA_KEY: ${{ secrets.RECAPTCHA_KEY }} 
+  #     run: npx sls deploy
+      
+  #   - name: deploy index-builder to AWS
+  #     working-directory: academy-2020-piemdb/index-builder
+  #     run: npx sls deploy
+
+  # deploy-database:
+  #   needs: code-quality
+  #   if: github.ref == 'refs/heads/master'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  
+  #   - name: Configure AWS Credentials
+  #     uses: aws-actions/configure-aws-credentials@v1
+  #     with:
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws-region: eu-west-2
+    
+  #   - name: install dependencies
+  #     working-directory: academy-2020-piemdb/serverless-database
+  #     run: npm install 
+    
+  #   - name: deploy to dynamo
+  #     working-directory: academy-2020-piemdb/serverless-database
+  #     run: npx sls deploy
