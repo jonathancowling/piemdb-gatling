@@ -1,10 +1,6 @@
 package gatling
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import java.{util => ju}
-import io.gatling.commons.validation.Validation
-import io.gatling.core.check.Validator
-import io.gatling.commons.validation._
 
 object RandomPie {
   val random = exec(
