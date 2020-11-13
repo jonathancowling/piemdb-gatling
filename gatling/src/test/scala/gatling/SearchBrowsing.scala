@@ -2,8 +2,6 @@ package gatling
 import scala.util.Random
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import java.{util => ju}
-import gatling.utils.debug
 
 object SearchBrowsing {
   private val searchData = csv("gatling/data/search.csv").circular

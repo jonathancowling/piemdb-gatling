@@ -1,8 +1,5 @@
 package gatling
 import io.gatling.commons.validation._
-import io.gatling.core.Predef._
-import io.gatling.http.Predef._
-import java.{util => ju}
 import io.gatling.core.check.Validator
 
 sealed class UUIDValidator extends Validator[String] {
