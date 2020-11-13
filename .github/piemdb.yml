@@ -1,0 +1,33 @@
+name: piemdb-code-quality
+on: 
+  push:
+    paths:
+      - academy-2020-piemdb/**
+jobs:
+  piemdb-code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install all node modules
+        working-directory: academy-2020-piemdb
+        run: ./getToThaChoppa.sh
+        
+      - name: Run linter on app
+        working-directory: academy-2020-piemdb/app
+        run: ./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules --ignore-pattern dist
+      - name: Run linter on app-api
+        working-directory: academy-2020-piemdb/app-api
+        run: ./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules --ignore-pattern dist
+      - name: Run linter on index-builder
+        working-directory: academy-2020-piemdb/index-builder
+        run: ./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules --ignore-pattern dist
+
+      - name: Unit tests for api
+        working-directory: academy-2020-piemdb/app-api
+        run: npm test # npx jest --coverage
+      - name: Unit tests for app
+        working-directory: academy-2020-piemdb/app
+        run: npm test # npx jest --coverage
+      - name: Unit tests for index-builder
+        working-directory: academy-2020-piemdb/index-builder
+        run: npm test
