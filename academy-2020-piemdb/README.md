@@ -5,7 +5,7 @@
 
 ## Steps to spin up local dev DB
 - run `docker-compose up -d`
-- cd into scripts and run `node seed-ddb.js` 
+- cd into scripts and run `TABLE_NAME=PieMDB-database-${stage} node seed-ddb.js` 
     - may have to kill current docker image: below commands nuke all containers!
         - docker kill $(docker ps -q)
         - docker rm $(docker ps -a -q)
