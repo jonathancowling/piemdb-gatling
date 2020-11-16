@@ -32,7 +32,6 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   const data = JSON.parse(contents);
   // console.log(`File contents: ${contents}`);
   const table = data.DataModel[0];
-  table.TableName = process.env.TABLE_NAME;
 
   const result = await dynamodb.createTable(table).promise().catch((err) => {
     console.log(err);
