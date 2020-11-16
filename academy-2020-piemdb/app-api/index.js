@@ -11,7 +11,6 @@ const validateRecapture = require('./validateRecapture');
 const app = express();
 app.use(morgan('tiny'));
 
-const port = 3000;
 const { getPieById } = require('./dynamodb-query/getPieById');
 const { randomDateReturn, getFirstDayOfWeek } = require('./randomDateGenerator.js');
 const { getRandomPieLE } = require('./dynamodb-query/getRandomPieLE');
@@ -143,12 +142,5 @@ app.use((req, res) => {
 });
 // throw error if incorrect env vars set
 envVarChecker();
-
-/* istanbul ignore next  */
-if (stage !== 'test' && stage !== 'prod') {
-  app.listen(port, () => {
-    console.log(`PieMDB app-api listening at port ${port} on ${stage}`);
-  });
-}
 
 module.exports = { app };
