@@ -29,11 +29,11 @@ jobs:
         working-directory: academy-2020-piemdb/app-api
         env: 
           RECAPTCHA_KEY: ${{ secrets.RECAPTCHA_KEY }} 
-        run: NODE_ENV=test npx sls deploy
+        run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx sls deploy --stage test
         
       - name: deploy index-builder to AWS
         working-directory: academy-2020-piemdb/index-builder
-        run: NODE_ENV=test npx sls deploy
+        run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx sls deploy --stage test
 
   deploy-database:
       if: github.event.base_ref == 'refs/heads/master'
@@ -54,4 +54,4 @@ jobs:
       
       - name: deploy to dynamo
         working-directory: academy-2020-piemdb/serverless-database
-        run: NODE_ENV=test npx sls deploy
+        run: REGION='eu-west-2' npx sls deploy --stage test

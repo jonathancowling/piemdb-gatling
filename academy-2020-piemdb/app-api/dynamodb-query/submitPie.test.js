@@ -7,9 +7,9 @@ const isTest = process.env.JEST_WORKER_ID;
 const config = {
   convertEmptyValues: true,
   ...(isTest && {
-    endpoint: 'localhost:8000',
+    endpoint: process.env.ENDPOINT,
     sslEnabled: false,
-    region: 'local-env',
+    region: process.env.REGION,
   }),
 };
 

@@ -120,7 +120,6 @@ app.put('/submitPie', async (req, res) => {
 app.get('/search/:query', async (req, res) => {
   const { query } = req.params;
   const searchTerms = query.split(' ').map((t) => `${t}~1`).join(' ');
-  console.info(`Search terms: ${searchTerms}`);
   // Load index
   let data;
   // will run on prod/test bucket if the env var is defined
