@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const lunr = require('lunr');
+require('dotenv').config();
 const AWS = require('aws-sdk');
 
 module.exports.handle = async () => {
@@ -15,7 +16,8 @@ module.exports.handle = async () => {
   } else if (stage === 'dev') {
     // Default to dev if env is provided but not prod
     AWS.config.update({
-      region: awsRegion, endpoint: awsEndpoint, accessKeyId: 'access_key_id', secretAccessKey: 'secret_access_key',
+      region: awsRegion,
+      endpoint: awsEndpoint,
     });
   }
   // Get data from dynamodb
