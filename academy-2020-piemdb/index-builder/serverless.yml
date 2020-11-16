@@ -3,12 +3,14 @@ frameworkVersion: '2'
 
 provider:
   name: aws
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'test'}
   runtime: nodejs12.x
   environment:
-    NODE_ENV: ${opt:stage, 'test'}
+    ENDPOINT: ${env:ENPOINT}
     REGION: ${env:REGION}
-  region: ${env:REGION}
+    NODE_ENV: ${self:provider.stage}
+    BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
+  region: ${self:provider.environment.REGION}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -34,12 +36,10 @@ functions:
     memorySize: 256
     events:
       - schedule: rate(10 minutes)
-    environment:
-      BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
 
 resources:
   Resources:
     SiteBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: piemdb-search-index-bucket-${self:provider.stage}
+        BucketName: ${self:provider.environment.BUCKET_NAME}

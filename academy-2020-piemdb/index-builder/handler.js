@@ -5,13 +5,17 @@ const AWS = require('aws-sdk');
 module.exports.handle = async () => {
   const stage = process.env.NODE_ENV;
   const awsRegion = process.env.REGION;
-  if (stage === 'prod') {
+  const awsEndpoint = process.env.ENDPOINT;
+  if (stage === 'prod' || stage === 'test') {
     // Set the region for real dynamodb
-    AWS.config.update({ region: awsRegion });
+    AWS.config.update({
+      region: awsRegion,
+      endpint: awsEndpoint,
+    });
   } else if (stage === 'dev') {
     // Default to dev if env is provided but not prod
     AWS.config.update({
-      region: awsRegion, endpoint: 'http://localhost:8000', accessKeyId: 'access_key_id', secretAccessKey: 'secret_access_key',
+      region: awsRegion, endpoint: awsEndpoint, accessKeyId: 'access_key_id', secretAccessKey: 'secret_access_key',
     });
   }
   // Get data from dynamodb

@@ -5,15 +5,17 @@ frameworkVersion: '2'
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'test'}
   region: ${env:REGION}
   httpApi:
     cors: true
   environment:
-    NODE_ENV: ${opt:stage, 'test'}
-    REGION: ${env:REGION}
+    NODE_ENV: ${self:provider.stage}
+    REGION: ${self:provider.region}
     ENDPOINT: ${env:ENDPOINT}
     RECAPTCHA_KEY: ${env:RECAPTCHA_KEY}
+    INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
+    DATABASE_BUCKET: PieMDB-database-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -25,18 +27,18 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}'
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}/index/find-by-week'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${self:provider.environment.DATABASE_BUCKET}'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${self:provider.environment.DATABASE_BUCKET}/index/find-by-week'
     - Effect: Allow
       Action:
         - s3:ListBucket
       Resource:
-        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}'
+        - 'arn:aws:s3:::${self:provider.environment.INDEX_BUCKET_NAME}'
     - Effect: Allow
       Action:
         - s3:*Object
       Resource:
-        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+        - 'arn:aws:s3:::${self:provider.environment.INDEX_BUCKET_NAME}/*'
 
 functions:
   piemdb-app-api:
@@ -46,8 +48,6 @@ functions:
       - httpApi:
           path: /{any+}
           method: '*'
-    environment:
-      INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
 
 plugins:
   - serverless-domain-manager
