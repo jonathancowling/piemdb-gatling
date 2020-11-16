@@ -13,7 +13,6 @@ const config = {
 };
 
 const ddb = new DocumentClient(config);
-console.log(process.env.NODE_ENV);
 
 describe('Should correctly submit a review to the database', () => {
   it('Should insert a review into the table', async () => {
