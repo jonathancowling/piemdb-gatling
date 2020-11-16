@@ -32,6 +32,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   const data = JSON.parse(contents);
   // console.log(`File contents: ${contents}`);
   const table = data.DataModel[0];
+  table.TableName = process.env.TABLE_NAME;
 
   const result = await dynamodb.createTable(table).promise().catch((err) => {
     console.log(err);
@@ -56,7 +57,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   for (let i = 0; i < batchedPies.length; i += 1) {
     const pieParams = {
       RequestItems: {
-        'PieMDB-database-dev': batchedPies[i].map((pie) => ({
+        [table.TableName]: batchedPies[i].map((pie) => ({
           PutRequest: {
             Item: pie,
           },
@@ -70,7 +71,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   for (let i = 0; i < batchedReviews.length; i += 1) {
     const reviewParams = {
       RequestItems: {
-        'PieMDB-database-dev': batchedReviews[i].map((review) => ({
+        [table.TableName]: batchedReviews[i].map((review) => ({
           PutRequest: {
             Item: review,
           },

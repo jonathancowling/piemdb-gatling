@@ -9,7 +9,7 @@
   },
   "DataModel": [
     {
-      "TableName": "PieMDB-database-test",
+      "TableName": "PieMDB-database-dev",
       "KeySchema": [
         {
           "AttributeName": "uuid",
