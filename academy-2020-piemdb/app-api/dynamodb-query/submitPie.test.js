@@ -7,9 +7,9 @@ const isTest = process.env.JEST_WORKER_ID;
 const config = {
   convertEmptyValues: true,
   ...(isTest && {
-    endpoint: 'localhost:8000',
+    endpoint: process.env.ENDPOINT,
     sslEnabled: false,
-    region: 'local-env',
+    region: process.env.REGION,
   }),
 };
 
@@ -41,7 +41,7 @@ describe('Should correctly submit a pie to the database', () => {
     await submitPie(pieData);
     // act
     const { Item } = await ddb.get({
-      TableName: `PieMDB-database-${process.env.NODE_ENV}`,
+      TableName: `${process.env.TABLE_NAME}`,
       Key: {
         uuid: randomUUID,
         'sort-key': 'PIE',

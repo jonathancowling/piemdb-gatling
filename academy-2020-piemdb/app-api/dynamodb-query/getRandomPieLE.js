@@ -1,7 +1,7 @@
 const { createDynamoDbClient, executeQuery } = require('./dynamoBoilerplate');
 
 const createQueryInput = (week, uuid) => ({
-  TableName: `PieMDB-database-${process.env.NODE_ENV}`,
+  TableName: `${process.env.TABLE_NAME}`,
   ScanIndexForward: false,
   ConsistentRead: false,
   IndexName: 'find-by-week',
