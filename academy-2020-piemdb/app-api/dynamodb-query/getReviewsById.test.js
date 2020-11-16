@@ -12,7 +12,7 @@ const config = {
   }),
 };
 
-const tableName = `PieMDB-database-${process.env.NODE_ENV}`;
+const tableName = `${process.env.TABLE_NAME}`;
 
 const ddb = new DocumentClient(config);
 

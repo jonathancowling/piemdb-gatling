@@ -41,7 +41,7 @@ describe('Should correctly submit a pie to the database', () => {
     await submitPie(pieData);
     // act
     const { Item } = await ddb.get({
-      TableName: `PieMDB-database-${process.env.NODE_ENV}`,
+      TableName: `${process.env.TABLE_NAME}`,
       Key: {
         uuid: randomUUID,
         'sort-key': 'PIE',

@@ -13,6 +13,7 @@ const config = {
 };
 
 const ddb = new DocumentClient(config);
+console.log(process.env.NODE_ENV);
 
 describe('Should correctly submit a review to the database', () => {
   it('Should insert a review into the table', async () => {
@@ -30,7 +31,7 @@ describe('Should correctly submit a review to the database', () => {
     // act
     await submitReviewByPieId(reviewData);
     const { Item } = await ddb.get({
-      TableName: `PieMDB-database-${process.env.NODE_ENV}`,
+      TableName: `${process.env.TABLE_NAME}`,
       Key: {
         uuid: reviewData.uuid,
         'sort-key': reviewData['sort-key'],

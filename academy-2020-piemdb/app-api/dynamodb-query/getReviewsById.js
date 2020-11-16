@@ -1,7 +1,7 @@
 const { createDynamoDbClient, executeQuery } = require('./dynamoBoilerplate');
 
 const createQueryInput = (id) => ({
-  TableName: `${process.env.DATABASE_BUCKET}`,
+  TableName: `${process.env.TABLE_NAME}`,
   ScanIndexForward: false,
   ConsistentRead: false,
   KeyConditionExpression: '#50b30 = :50b30 And begins_with(#50b31, :50b31)',
