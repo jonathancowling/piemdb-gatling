@@ -6,6 +6,7 @@ const lunr = require('lunr');
 const fs = require('fs').promises;
 // eslint-disable-next-line import/no-extraneous-dependencies
 const AWS = require('aws-sdk');
+const asyncHandler = require('express-async-handler');
 const validateRecapture = require('./validateRecapture');
 
 const app = express();
@@ -25,19 +26,19 @@ const { checkReview } = require('./checkingFunctions/checkReview');
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-app.get('/pie/:id', async (req, res) => {
+app.get('/pie/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const pie = await getPieById(id);
   res.json(pie);
-});
+}));
 
-app.get('/review/:id', async (req, res) => {
+app.get('/review/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const pieReviews = await getReviewsById(id);
   res.json(pieReviews);
-});
+}));
 
-app.put('/review', async (req, res) => {
+app.put('/review', asyncHandler(async (req, res) => {
   // check for correct input format
   const { review } = req.body;
   if (!checkReview(review)) {
@@ -60,9 +61,9 @@ app.put('/review', async (req, res) => {
   review['sort-key'] = `REVIEW-${uuid()}`;
   submitReviewByPieId(review);
   res.json(review);
-});
+}));
 
-app.get('/randomPie', async (req, res) => {
+app.get('/randomPie', asyncHandler(async (req, res) => {
   // returns a uuid of a random pie
   const randomUUID = uuid();
   let randomDate;
@@ -86,9 +87,9 @@ app.get('/randomPie', async (req, res) => {
     // After multiple attempts, no valid pie found
     res.sendStatus(500);
   }
-});
+}));
 
-app.put('/submitPie', async (req, res) => {
+app.put('/submitPie', asyncHandler(async (req, res) => {
   const randomUUID = uuid();
 
   const { token } = req.body;
@@ -113,9 +114,9 @@ app.put('/submitPie', async (req, res) => {
   await submitPie(pieData);
 
   res.json(randomUUID);
-});
+}));
 
-app.get('/search/:query', async (req, res) => {
+app.get('/search/:query', asyncHandler(async (req, res) => {
   const { query } = req.params;
   const searchTerms = query.split(' ').map((t) => `${t}~1`).join(' ');
   console.info(`Search terms: ${searchTerms}`);
@@ -136,10 +137,10 @@ app.get('/search/:query', async (req, res) => {
   const idx = lunr.Index.load(JSON.parse(data));
   const results = idx.search(searchTerms);
   res.json(results.map((r) => r.ref));
-});
+}));
 
-app.use((req, res) => {
-  res.send("Endpoint doesn't exist...");
+app.use((_req, res) => {
+  res.sendStatus(404);
 });
 // throw error if incorrect env vars set
 envVarChecker();

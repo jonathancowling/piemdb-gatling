@@ -17,7 +17,7 @@ the following environment variables are used by the script:
 ## Example
 
 ```bash
-docker run -v $(pwd):/mount -e BASE_PATH='http://host.docker.internal:3000' -it owasp/zap2docker-stable /mount/zap.sh
+docker run -v $(pwd):/mount -e BASE_PATH='http://host.docker.internal:3000' owasp/zap2docker-stable /mount/zap.sh
 ```
 
 > Note: host.docker.internal currently only works on MacOS
