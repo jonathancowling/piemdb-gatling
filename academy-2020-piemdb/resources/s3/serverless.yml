@@ -20,4 +20,3 @@ outputs:
     Ref: S3SharedBucketArtifacts
   S3SharedBucketArtifactsArn:
     Fn::GetAtt: S3SharedBucketArtifacts.Arn
-    
