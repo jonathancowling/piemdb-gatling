@@ -1,4 +1,4 @@
-service: PieMDB-index-builder
+service: piemdb-index-builder
 frameworkVersion: '2'
 
 provider:
@@ -33,7 +33,7 @@ provider:
         - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
 
 custom:
-  sharedBucketName: ${cf:PieMDB-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
+  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
 
 functions:
   piemdb-index-builder:

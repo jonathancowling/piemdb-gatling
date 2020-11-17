@@ -16,7 +16,7 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         BillingMode: PAY_PER_REQUEST
-        TableName: piemdb-database-${self:provider.stage}
+        TableName: PieMDB-database-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: week-posted
             AttributeType: S

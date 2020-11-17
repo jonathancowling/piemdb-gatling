@@ -17,7 +17,7 @@ provider:
     ENDPOINT: ${env:ENDPOINT, 'https://{service}.{region}.amazonaws.com'}
     RECAPTCHA_KEY: ${env:RECAPTCHA_KEY, 'recaptcha-not-set'}
     INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
-    TABLE_NAME: piemdb-database-${self:provider.stage}
+    TABLE_NAME: PieMDB-database-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
