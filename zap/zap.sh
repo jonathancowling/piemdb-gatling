@@ -8,17 +8,24 @@ function on_exit() {
   exit $LAST_COMMAND_EXIT_CODE
 }
 
-trap on_exit SIGINT EXIT
+trap on_exit EXIT
+
+export ZAP_PATH
+export ZAP_PORT
+export ZAP_URL
+export ZAP_API_KEY
+export ZAP_LOG_PATH
 
 [ -n "${PATHS_FILE-}" ] || PATHS_FILE="/mount/paths.txt"
 [ -n "${EXCLUDE_FILE-}" ] || EXCLUDE_FILE="/mount/exclude.txt"
 [ -n "${BASE_URL-}" ] || BASE_URL="http://localhost:3000"
-[ -n "${ZAP_API_KEY-}" ] || export ZAP_API_KEY="$(openssl rand -base64 32)"
+[ -n "${ZAP_API_KEY-}" ] || ZAP_API_KEY="$(openssl rand -base64 32)"
 [ -n "${REPORT_STDOUT-}" ] || REPORT_STDOUT=""
 [ -n "${REPORT_FORMAT-}" ] || REPORT_FORMAT="md"
 [ -n "${USE_EXISTING_PROXY-}" ] || USE_EXISTING_PROXY=""
+PROXY_ALREADY_RUNNING=0
+zap-cli status >&2 || PROXY_ALREADY_RUNNING=$?
 
-PROXY_ALREADY_RUNNING="$(zap-cli status >&2 && echo $?)"
 [ -z "${USE_EXISTING_PROXY}" ] && [ "${PROXY_ALREADY_RUNNING}" -eq "0" ] && exit 1
 [ -n "${USE_EXISTING_PROXY}" ] && [ "${PROXY_ALREADY_RUNNING}" -ne "0" ] && exit 1
 
