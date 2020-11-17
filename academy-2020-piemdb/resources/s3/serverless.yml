@@ -1,6 +1,4 @@
-org: Infinipie.Works
-app: PieMDB
-service: ${self:app}-shared-bucket-artifacts
+service: PieMDB-shared-bucket-artifacts
 provider:
   name: aws
   runtime: nodejs12.x

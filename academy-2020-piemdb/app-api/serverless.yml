@@ -1,6 +1,4 @@
-org: Infinipie.Works
-app: PieMDB
-service: ${self:app}
+service: PieMDB
 
 frameworkVersion: '2'
 
@@ -59,7 +57,7 @@ plugins:
 
 custom:
   basename: ${self:service}-${self:provider.stage}
-  sharedBucketName: ${output:${self:app}-shared-bucket-artifacts.S3SharedBucketArtifactsName}
+  sharedBucketName: ${output:PieMDB-shared-bucket-artifacts.S3SharedBucketArtifactsName}
   customDomain:
     domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
     apiType: http

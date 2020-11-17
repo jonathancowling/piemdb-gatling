@@ -1,6 +1,4 @@
-org: Infinipie.Works
-app: PieMDB
-service: ${self:app}-index-builder
+service: PieMDB-index-builder
 frameworkVersion: '2'
 
 provider:
@@ -36,7 +34,7 @@ provider:
 
 custom:
   basename: ${self:service}-${self:provider.stage}
-  sharedBucketName: ${output:${self:app}-shared-bucket-artifacts.S3SharedBucketArtifactsName}
+  sharedBucketName: ${output:PieMDB-shared-bucket-artifacts.S3SharedBucketArtifactsName}
 
 functions:
   piemdb-index-builder:

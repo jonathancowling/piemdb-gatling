@@ -1,6 +1,4 @@
-org: Infinipie.Works
-app: PieMDB
-service: ${self:app}-serverless-database
+service: PieMDB-serverless-database
 
 frameworkVersion: '2'
 
@@ -44,5 +42,5 @@ resources:
 
 custom:
   basename: ${self:service}-${self:provider.stage}
-  sharedBucketName: ${output:${self:app}-shared-bucket-artifacts.S3SharedBucketArtifactsName}
+  sharedBucketName: ${output:PieMDB-shared-bucket-artifacts.S3SharedBucketArtifactsName}
 
