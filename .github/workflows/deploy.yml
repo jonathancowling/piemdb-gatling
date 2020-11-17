@@ -22,7 +22,7 @@ jobs:
 
       - name: deploy bucket
         working-directory: academy-2020-piemdb/resources/s3
-        run: REGION='eu-west-2' sls deploy --stage test
+        run: REGION='eu-west-2' npx sls deploy --stage test
 
   deploy-app-and-api:
       needs: deploy-deployment-bucket
