@@ -56,7 +56,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   for (let i = 0; i < batchedPies.length; i += 1) {
     const pieParams = {
       RequestItems: {
-        'PieMDB-database': batchedPies[i].map((pie) => ({
+        [table.TableName]: batchedPies[i].map((pie) => ({
           PutRequest: {
             Item: pie,
           },
@@ -70,7 +70,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   for (let i = 0; i < batchedReviews.length; i += 1) {
     const reviewParams = {
       RequestItems: {
-        'PieMDB-database': batchedReviews[i].map((review) => ({
+        [table.TableName]: batchedReviews[i].map((review) => ({
           PutRequest: {
             Item: review,
           },

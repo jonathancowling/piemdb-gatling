@@ -1,19 +1,23 @@
-service: PieMDB
+service: piemdb
 
 frameworkVersion: '2'
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: ${opt:stage, 'dev'}
-  region: ${env:REGION}
+  stage: ${opt:stage, 'test'}
+  region: ${env:REGION, 'eu-west-2'}
   httpApi:
     cors: true
+  deploymentBucket:
+    name: ${self:custom.sharedBucketName}
   environment:
-    NODE_ENV: ${opt:stage, 'test'}
-    REGION: ${env:REGION}
-    ENDPOINT: ${env:ENDPOINT}
-    RECAPTCHA_KEY: ${env:RECAPTCHA_KEY}
+    NODE_ENV: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    ENDPOINT: ${env:ENDPOINT, 'https://{service}.{region}.amazonaws.com'}
+    RECAPTCHA_KEY: ${env:RECAPTCHA_KEY, 'recaptcha-not-set'}
+    INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
+    TABLE_NAME: PieMDB-database-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -25,18 +29,18 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}'
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}/index/find-by-week'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${self:provider.environment.TABLE_NAME}'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${self:provider.environment.TABLE_NAME}/index/find-by-week'
     - Effect: Allow
       Action:
         - s3:ListBucket
       Resource:
-        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}'
+        - 'arn:aws:s3:::${self:provider.environment.INDEX_BUCKET_NAME}'
     - Effect: Allow
       Action:
         - s3:*Object
       Resource:
-        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+        - 'arn:aws:s3:::${self:provider.environment.INDEX_BUCKET_NAME}/*'
 
 functions:
   piemdb-app-api:
@@ -46,14 +50,13 @@ functions:
       - httpApi:
           path: /{any+}
           method: '*'
-    environment:
-      INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
 
 plugins:
   - serverless-domain-manager
   - serverless-s3-sync
-  
+
 custom:
+  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
   customDomain:
     domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
     apiType: http

@@ -12,7 +12,6 @@ const validateRecapture = require('./validateRecapture');
 const app = express();
 app.use(morgan('tiny'));
 
-const port = 3000;
 const { getPieById } = require('./dynamodb-query/getPieById');
 const { randomDateReturn, getFirstDayOfWeek } = require('./randomDateGenerator.js');
 const { getRandomPieLE } = require('./dynamodb-query/getRandomPieLE');
@@ -25,6 +24,8 @@ const { checkReview } = require('./checkingFunctions/checkReview');
 
 app.use(cors({ origin: true }));
 app.use(express.json());
+
+const stage = process.env.NODE_ENV;
 
 app.get('/pie/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -48,7 +49,7 @@ app.put('/review', asyncHandler(async (req, res) => {
   // check for re-captcha validity
   const { token } = req.body;
   const captureResponse = await validateRecapture(token);
-  if (!captureResponse && process.env.NODE_ENV === 'prod') {
+  if (!captureResponse && stage === 'prod') {
     res.status(400).json('Failed captcha, please retry');
     return;
   }
@@ -94,7 +95,7 @@ app.put('/submitPie', asyncHandler(async (req, res) => {
 
   const { token } = req.body;
   const captureResponse = await validateRecapture(token);
-  if (!captureResponse && process.env.NODE_ENV === 'prod') {
+  if (!captureResponse && stage === 'prod') {
     res.status(400).json('Failed captcha, please retry');
     return;
   }
@@ -119,8 +120,6 @@ app.put('/submitPie', asyncHandler(async (req, res) => {
 app.get('/search/:query', asyncHandler(async (req, res) => {
   const { query } = req.params;
   const searchTerms = query.split(' ').map((t) => `${t}~1`).join(' ');
-  console.info(`Search terms: ${searchTerms}`);
-  const stage = process.env.NODE_ENV;
   // Load index
   let data;
   // will run on prod/test bucket if the env var is defined
@@ -144,12 +143,5 @@ app.use((_req, res) => {
 });
 // throw error if incorrect env vars set
 envVarChecker();
-
-/* istanbul ignore next  */
-if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'prod') {
-  app.listen(port, () => {
-    console.log(`PieMDB app-api listening at port ${port} on ${process.env.NODE_ENV}`);
-  });
-}
 
 module.exports = { app };

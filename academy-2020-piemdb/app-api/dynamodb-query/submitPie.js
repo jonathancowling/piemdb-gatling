@@ -1,7 +1,7 @@
 const { executePutItem, createDynamoDbClient } = require('./dynamoBoilerplate');
 
 const createPutItemInput = (pieData) => ({
-  TableName: `PieMDB-database-${process.env.NODE_ENV}`,
+  TableName: `${process.env.TABLE_NAME}`,
   Item: pieData,
 });
 

@@ -1,7 +1,7 @@
 const { createDynamoDbClient, executeQuery } = require('./dynamoBoilerplate');
 
 const createQueryInput = (id) => ({
-  TableName: `PieMDB-database-${process.env.NODE_ENV}`,
+  TableName: `${process.env.TABLE_NAME}`,
   ScanIndexForward: false,
   ConsistentRead: false,
   KeyConditionExpression: '#50b30 = :50b30 And #50b31 = :50b31',

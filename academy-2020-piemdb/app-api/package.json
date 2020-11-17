@@ -4,14 +4,15 @@
   "description": "The api that the app will use",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV='test' REGION='local-env' ENDPOINT='localhost:8000' npx jest --coverage",
-    "prod": "NODE_ENV='prod' node index.js",
-    "dev": "NODE_ENV='dev' node index.js"
+    "test": "TABLE_NAME='PieMDB-database-test' REGION='local-env' ENDPOINT='localhost:8000' npx jest --coverage",
+    "prod": "NODE_ENV='prod' REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' node server.js",
+    "dev": "NODE_ENV='dev' REGION='localhost' ENDPOINT='http://localhost:8000' node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
     "express-throttle": "^2.0.0",
