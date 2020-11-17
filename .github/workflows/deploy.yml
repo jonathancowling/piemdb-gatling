@@ -4,7 +4,7 @@ on:
     tags: 
       - v[0-9]+.[0-9]+.[0-9]+*
 jobs:
-  deploy-deployment-buckets:
+  deploy-deployment-bucket:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v2
@@ -14,6 +14,7 @@ jobs:
         run: REGION='eu-west-2' sls deploy --stage test
 
   deploy-app-and-api:
+      needs: deploy-deployment-bucket
       if: github.event.base_ref == 'refs/heads/master'
       runs-on: ubuntu-latest
       steps:
@@ -45,6 +46,7 @@ jobs:
         run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx sls deploy --stage test
 
   deploy-database:
+      needs: deploy-deployment-bucket
       if: github.event.base_ref == 'refs/heads/master'
       runs-on: ubuntu-latest
       steps:
