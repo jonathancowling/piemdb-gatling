@@ -1,4 +1,6 @@
-service: PieMDB-serverless-database
+org: Infinipie.Works
+app: PieMDB
+service: ${self:app}-serverless-database
 
 frameworkVersion: '2'
 
@@ -7,6 +9,8 @@ provider:
   stage: ${opt:stage, 'dev'}
   runtime: nodejs12.x
   region: ${env:REGION}
+  deploymentBucket:
+    name: ${self:custom.sharedBucketName}
 
 resources: 
   Resources:
@@ -37,4 +41,8 @@ resources:
                 KeyType: HASH
               - AttributeName: uuid
                 KeyType: RANGE
+
+custom:
+  basename: ${self:service}-${self:provider.stage}
+  sharedBucketName: ${output:${self:app}-shared-bucket-artifacts.S3SharedBucketArtifactsName}
 

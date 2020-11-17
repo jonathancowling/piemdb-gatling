@@ -1,4 +1,6 @@
-service: PieMDB
+org: Infinipie.Works
+app: PieMDB
+service: ${self:app}
 
 frameworkVersion: '2'
 
@@ -9,6 +11,8 @@ provider:
   region: ${env:REGION}
   httpApi:
     cors: true
+  deploymentBucket:
+    name: ${self:custom.sharedBucketName}
   environment:
     NODE_ENV: ${self:provider.stage}
     REGION: ${self:provider.region}
@@ -52,8 +56,10 @@ functions:
 plugins:
   - serverless-domain-manager
   - serverless-s3-sync
-  
+
 custom:
+  basename: ${self:service}-${self:provider.stage}
+  sharedBucketName: ${output:${self:app}-shared-bucket-artifacts.S3SharedBucketArtifactsName}
   customDomain:
     domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
     apiType: http

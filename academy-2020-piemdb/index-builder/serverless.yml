@@ -1,4 +1,6 @@
-service: piemdb-index-builder
+org: Infinipie.Works
+app: PieMDB
+service: ${self:app}-index-builder
 frameworkVersion: '2'
 
 provider:
@@ -11,6 +13,8 @@ provider:
     NODE_ENV: ${self:provider.stage}
     BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
   region: ${self:provider.environment.REGION}
+  deploymentBucket:
+    name: ${self:custom.sharedBucketName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -29,6 +33,10 @@ provider:
         - s3:*Object
       Resource:
         - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+
+custom:
+  basename: ${self:service}-${self:provider.stage}
+  sharedBucketName: ${output:${self:app}-shared-bucket-artifacts.S3SharedBucketArtifactsName}
 
 functions:
   piemdb-index-builder:
