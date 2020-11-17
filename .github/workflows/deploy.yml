@@ -23,7 +23,7 @@ jobs:
 
       - name: deploy bucket
         working-directory: academy-2020-piemdb/resources/s3
-        run: REGION='eu-west-2' npx sls deploy --stage test
+        run: REGION='eu-west-2' npx serverless deploy --stage test
 
   deploy-app-and-api:
       needs: deploy-deployment-bucket
@@ -51,11 +51,15 @@ jobs:
         working-directory: academy-2020-piemdb/app-api
         env: 
           RECAPTCHA_KEY: ${{ secrets.RECAPTCHA_KEY }} 
-        run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx sls deploy --stage test
-        
+        run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx serverless deploy --stage test
+
+      - name: build index-builder
+        working-directory: academy-2020-piemdb/index-builder
+        run: npm install
+
       - name: deploy index-builder to AWS
         working-directory: academy-2020-piemdb/index-builder
-        run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx sls deploy --stage test
+        run: REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' npx serverless deploy --stage test
 
   deploy-database:
       needs: deploy-deployment-bucket
@@ -77,4 +81,4 @@ jobs:
       
       - name: deploy to dynamo
         working-directory: academy-2020-piemdb/serverless-database
-        run: REGION='eu-west-2' npx sls deploy --stage test
+        run: REGION='eu-west-2' npx serverless deploy --stage test
