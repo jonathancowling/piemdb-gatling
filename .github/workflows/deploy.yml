@@ -17,7 +17,7 @@ jobs:
           aws-region: eu-west-2
 
       - name: deploy bucket
-        working-directory: resources/s3
+        working-directory: academy-2020-piemdb/resources/s3
         run: REGION='eu-west-2' sls deploy --stage test
 
   deploy-app-and-api:
