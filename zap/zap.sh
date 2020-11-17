@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 function on_exit() {
   LAST_COMMAND_EXIT_CODE=$?
-  [ -z "${USE_EXISTING_PROXY}" ] && zap-cli shutdown >&2
+  [ -z "${USE_EXISTING_PROXY}" ] && [ "${PROXY_ALREADY_RUNNING}" -ne "0" ] && zap-cli shutdown >&2
   exit $LAST_COMMAND_EXIT_CODE
 }
 
@@ -16,8 +16,11 @@ trap on_exit SIGINT EXIT
 [ -n "${ZAP_API_KEY-}" ] || export ZAP_API_KEY="$(openssl rand -base64 32)"
 [ -n "${REPORT_STDOUT-}" ] || REPORT_STDOUT=""
 [ -n "${REPORT_FORMAT-}" ] || REPORT_FORMAT="md"
-zap-cli status >&2 && USE_EXISTING_PROXY="yes"
 [ -n "${USE_EXISTING_PROXY-}" ] || USE_EXISTING_PROXY=""
+
+PROXY_ALREADY_RUNNING="$(zap-cli status >&2 && echo $?)"
+[ -z "${USE_EXISTING_PROXY}" ] && [ "${PROXY_ALREADY_RUNNING}" -eq "0" ] && exit 1
+[ -n "${USE_EXISTING_PROXY}" ] && [ "${PROXY_ALREADY_RUNNING}" -ne "0" ] && exit 1
 
 [ -z "${USE_EXISTING_PROXY}" ] && zap-cli start --start-options "-config api.key=$ZAP_API_KEY" >&2
 zap-cli session new
