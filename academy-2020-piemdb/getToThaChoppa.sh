@@ -27,3 +27,10 @@ echo 'installing index-builder...'
 npm install
 echo 'installing index-builder done'
 popd
+
+# install in resources
+pushd resources
+echo 'installing resources...'
+npm install
+echo 'installing resources done'
+popd
