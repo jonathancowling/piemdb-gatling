@@ -5,6 +5,7 @@ on:
       - v[0-9]+.[0-9]+.[0-9]+*
 jobs:
   deploy-deployment-bucket:
+      if: github.event.base_ref == 'refs/heads/master'
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v2
