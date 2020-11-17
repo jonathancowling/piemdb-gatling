@@ -6,11 +6,13 @@ provider:
   stage: ${opt:stage, 'test'}
   runtime: nodejs12.x
   environment:
-    ENDPOINT: ${env:ENPOINT}
-    REGION: ${env:REGION}
+    ENDPOINT: ${env:ENPOINT, 'https://{service}.{region}.amazonaws.com'}
+    REGION: ${env:REGION, 'eu-west-2'}
     NODE_ENV: ${self:provider.stage}
     BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
   region: ${self:provider.environment.REGION}
+  deploymentBucket:
+    name: ${self:custom.sharedBucketName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -29,6 +31,9 @@ provider:
         - s3:*Object
       Resource:
         - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+
+custom:
+  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
 
 functions:
   piemdb-index-builder:

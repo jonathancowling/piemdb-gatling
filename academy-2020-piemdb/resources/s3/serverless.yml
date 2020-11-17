@@ -1,0 +1,18 @@
+service: piemdb-shared-bucket-artifacts
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, "dev"}
+  region: ${env:REGION, "eu-west-2"}
+custom:
+  bucketname: ${self:service}-${self:provider.stage}-${self:provider.region}-artifacts
+resources:
+  Resources:
+    S3SharedBucketArtifacts:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketname}
+  Outputs:
+    S3SharedBucketArtifactsName:
+      Value: 
+        Ref: S3SharedBucketArtifacts

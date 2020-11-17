@@ -1,4 +1,4 @@
-service: PieMDB-serverless-database
+service: piemdb-serverless-database
 
 frameworkVersion: '2'
 
@@ -6,11 +6,13 @@ provider:
   name: aws
   stage: ${opt:stage, 'dev'}
   runtime: nodejs12.x
-  region: ${env:REGION}
+  region: ${env:REGION, 'eu-west-2'}
+  deploymentBucket:
+    name: ${self:custom.sharedBucketName}
 
 resources: 
   Resources:
-    PieMDBServerlessDatabase:
+    piemdbServerlessDatabase:
       Type: AWS::DynamoDB::Table
       Properties:
         BillingMode: PAY_PER_REQUEST
@@ -37,4 +39,7 @@ resources:
                 KeyType: HASH
               - AttributeName: uuid
                 KeyType: RANGE
+
+custom:
+  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
 
