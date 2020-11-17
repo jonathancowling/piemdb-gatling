@@ -1,4 +1,4 @@
-service: PieMDB
+service: piemdb
 
 frameworkVersion: '2'
 
@@ -17,7 +17,7 @@ provider:
     ENDPOINT: ${env:ENDPOINT, 'https://{service}.{region}.amazonaws.com'}
     RECAPTCHA_KEY: ${env:RECAPTCHA_KEY, 'recaptcha-not-set'}
     INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
-    TABLE_NAME: PieMDB-database-${self:provider.stage}
+    TABLE_NAME: piemdb-database-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -57,7 +57,7 @@ plugins:
 
 custom:
   basename: ${self:service}-${self:provider.stage}
-  sharedBucketName: ${output:PieMDB-shared-bucket-artifacts.S3SharedBucketArtifactsName}
+  sharedBucketName: ${output:piemdb-shared-bucket-artifacts.S3SharedBucketArtifactsName}
   customDomain:
     domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
     apiType: http

@@ -1,4 +1,4 @@
-service: PieMDB-serverless-database
+service: piemdb-serverless-database
 
 frameworkVersion: '2'
 
@@ -12,11 +12,11 @@ provider:
 
 resources: 
   Resources:
-    PieMDBServerlessDatabase:
+    piemdbServerlessDatabase:
       Type: AWS::DynamoDB::Table
       Properties:
         BillingMode: PAY_PER_REQUEST
-        TableName: PieMDB-database-${self:provider.stage}
+        TableName: piemdb-database-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: week-posted
             AttributeType: S
@@ -42,5 +42,5 @@ resources:
 
 custom:
   basename: ${self:service}-${self:provider.stage}
-  sharedBucketName: ${output:PieMDB-shared-bucket-artifacts.S3SharedBucketArtifactsName}
+  sharedBucketName: ${output:piemdb-shared-bucket-artifacts.S3SharedBucketArtifactsName}
 

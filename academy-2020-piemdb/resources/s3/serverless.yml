@@ -1,4 +1,4 @@
-service: PieMDB-shared-bucket-artifacts
+service: piemdb-shared-bucket-artifacts
 provider:
   name: aws
   runtime: nodejs12.x
