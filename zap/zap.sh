@@ -10,8 +10,8 @@ function on_exit() {
 
 trap on_exit SIGINT EXIT
 
-[ -n "${PATHS_FILE-}" ] || PATHS_FILE="./paths.txt"
-[ -n "${EXCLUDE_FILE-}" ] || EXCLUDE_FILE="./exclude.txt"
+[ -n "${PATHS_FILE-}" ] || PATHS_FILE="/mount/paths.txt"
+[ -n "${EXCLUDE_FILE-}" ] || EXCLUDE_FILE="/mount/exclude.txt"
 [ -n "${BASE_URL-}" ] || BASE_URL="http://localhost:3000"
 [ -n "${ZAP_API_KEY-}" ] || export ZAP_API_KEY="$(openssl rand -base64 32)"
 [ -n "${REPORT_STDOUT-}" ] || REPORT_STDOUT=""

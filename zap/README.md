@@ -7,8 +7,8 @@ the following environment variables are used by the script:
 
 | Name | Meaning | Default |
 |---|---|---|
-| PATHS_FILE | The location of the file containing newline separated paths to open before running the active scan | ./paths.txt |
-| EXCLUDE_FILE | The location of the file containing newline separated patterns to be excluded before running the active scan | ./excludes.txt |
+| PATHS_FILE | The location of the file containing newline separated paths to open before running the active scan | /mount/paths.txt |
+| EXCLUDE_FILE | The location of the file containing newline separated patterns to be excluded before running the active scan | /mount/excludes.txt |
 | BASE_URL | The base url of the target | http://localhost:3000 |
 | USE_EXISTING_PROXY | If set to a non-empty string, do not start a new zap proxy | \[empty string\] | 
 | REPORT_STDOUT | If set to a non-empty string, print the report to stdout (as well as generate the report in `/zap/wrk`) | \[empty string\] |
