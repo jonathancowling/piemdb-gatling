@@ -56,8 +56,7 @@ plugins:
   - serverless-s3-sync
 
 custom:
-  basename: ${self:service}-${self:provider.stage}
-  sharedBucketName: ${output:piemdb-shared-bucket-artifacts.S3SharedBucketArtifactsName}
+  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
   customDomain:
     domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
     apiType: http

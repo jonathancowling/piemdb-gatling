@@ -5,16 +5,14 @@ provider:
   stage: ${opt:stage, "dev"}
   region: ${env:REGION, "eu-west-2"}
 custom:
-  basename: ${self:service}-${self:provider.stage}
-  bucketname: ${self:custom.basename}-${self:provider.region}-artifacts
+  bucketname: ${self:service}-${self:provider.stage}-${self:provider.region}-artifacts
 resources:
   Resources:
     S3SharedBucketArtifacts:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.bucketname}
-outputs:
-  S3SharedBucketArtifactsName:
-    Ref: S3SharedBucketArtifacts
-  S3SharedBucketArtifactsArn:
-    Fn::GetAtt: S3SharedBucketArtifacts.Arn
+  Outputs:
+    S3SharedBucketArtifactsName:
+      Value: 
+        Ref: S3SharedBucketArtifacts
