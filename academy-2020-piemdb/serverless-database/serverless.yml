@@ -8,7 +8,7 @@ provider:
   name: aws
   stage: ${opt:stage, 'dev'}
   runtime: nodejs12.x
-  region: ${env:REGION}
+  region: ${env:REGION, 'eu-west-2'}
   deploymentBucket:
     name: ${self:custom.sharedBucketName}
 

@@ -8,8 +8,8 @@ provider:
   stage: ${opt:stage, 'test'}
   runtime: nodejs12.x
   environment:
-    ENDPOINT: ${env:ENPOINT}
-    REGION: ${env:REGION}
+    ENDPOINT: ${env:ENPOINT, 'https://{service}.{region}.amazonaws.com'}
+    REGION: ${env:REGION, 'eu-west-2'}
     NODE_ENV: ${self:provider.stage}
     BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
   region: ${self:provider.environment.REGION}

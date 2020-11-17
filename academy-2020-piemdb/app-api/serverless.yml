@@ -8,7 +8,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   stage: ${opt:stage, 'test'}
-  region: ${env:REGION}
+  region: ${env:REGION, 'eu-west-2'}
   httpApi:
     cors: true
   deploymentBucket:
@@ -16,8 +16,8 @@ provider:
   environment:
     NODE_ENV: ${self:provider.stage}
     REGION: ${self:provider.region}
-    ENDPOINT: ${env:ENDPOINT}
-    RECAPTCHA_KEY: ${env:RECAPTCHA_KEY}
+    ENDPOINT: ${env:ENDPOINT, 'https://{service}.{region}.amazonaws.com'}
+    RECAPTCHA_KEY: ${env:RECAPTCHA_KEY, 'recaptcha-not-set'}
     INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
     TABLE_NAME: PieMDB-database-${self:provider.stage}
   iamRoleStatements:
