@@ -3,16 +3,17 @@ frameworkVersion: '2'
 
 provider:
   name: aws
-  stage: ${opt:stage, 'test'}
+  variableSyntax: "\\${{([ ~:a-zA-Z0-9._@\\'\",\\-\\/\\(\\)]+?)}}" # allows {} inside ${}
+  stage: ${{opt:stage, 'test'}}
   runtime: nodejs12.x
   environment:
-    ENDPOINT: ${env:ENPOINT, 'https://{service}.{region}.amazonaws.com'}
-    REGION: ${env:REGION, 'eu-west-2'}
-    NODE_ENV: ${self:provider.stage}
-    BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
-  region: ${self:provider.environment.REGION}
+    ENDPOINT: ${{env:ENPOINT, 'https://{service}.{region}.amazonaws.com'}}
+    REGION: ${{env:REGION, 'eu-west-2'}}
+    NODE_ENV: ${{self:provider.stage}}
+    BUCKET_NAME: piemdb-search-index-bucket-${{self:provider.stage}}
+  region: ${{self:provider.environment.REGION}}
   deploymentBucket:
-    name: ${self:custom.sharedBucketName}
+    name: ${{self:custom.sharedBucketName}}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -20,20 +21,20 @@ provider:
         - dynamodb:Query
         - dynamodb:Scan
       Resource:
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${self:provider.stage}'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/PieMDB-database-${{self:provider.stage}}'
     - Effect: Allow
       Action:
         - s3:ListBucket
       Resource:
-        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}'
+        - 'arn:aws:s3:::piemdb-search-index-bucket-${{self:provider.stage}}'
     - Effect: Allow
       Action:
         - s3:*Object
       Resource:
-        - 'arn:aws:s3:::piemdb-search-index-bucket-${self:provider.stage}/*'
+        - 'arn:aws:s3:::piemdb-search-index-bucket-${{self:provider.stage}}/*'
 
 custom:
-  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
+  sharedBucketName: ${{cf:piemdb-shared-bucket-artifacts-${{self:provider.stage}}.S3SharedBucketArtifactsName}}
 
 functions:
   piemdb-index-builder:
@@ -47,4 +48,4 @@ resources:
     SiteBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.BUCKET_NAME}
+        BucketName: ${{self:provider.environment.BUCKET_NAME}}

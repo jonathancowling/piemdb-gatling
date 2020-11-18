@@ -4,11 +4,12 @@ frameworkVersion: '2'
 
 provider:
   name: aws
-  stage: ${opt:stage, 'dev'}
+  variableSyntax: "\\${{([ ~:a-zA-Z0-9._@\\'\",\\-\\/\\(\\)]+?)}}" # allows {} inside ${}
+  stage: ${{opt:stage, 'dev'}}
   runtime: nodejs12.x
-  region: ${env:REGION, 'eu-west-2'}
+  region: ${{env:REGION, 'eu-west-2'}}
   deploymentBucket:
-    name: ${self:custom.sharedBucketName}
+    name: ${{self:custom.sharedBucketName}}
 
 resources: 
   Resources:
@@ -16,7 +17,7 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         BillingMode: PAY_PER_REQUEST
-        TableName: PieMDB-database-${self:provider.stage}
+        TableName: PieMDB-database-${{self:provider.stage}}
         AttributeDefinitions:
           - AttributeName: week-posted
             AttributeType: S
@@ -41,5 +42,5 @@ resources:
                 KeyType: RANGE
 
 custom:
-  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
+  sharedBucketName: ${{cf:piemdb-shared-bucket-artifacts-${{self:provider.stage}}.S3SharedBucketArtifactsName}}
 
