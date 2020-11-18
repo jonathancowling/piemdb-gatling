@@ -2,7 +2,6 @@
 - hosts: localhost
 
   tasks: 
-
     - name: Terminate Instances
       ec2_instance_facts:
         region: us-east-1

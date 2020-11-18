@@ -1,0 +1,98 @@
+---
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - role: create-ec2-instances
+
+- hosts: piemdb-testing
+  become: true
+  # gather_facts: true
+  tasks:
+    - name: Copy gatling code to ec2
+      copy:
+        remote_src: true
+        src: ../gatling
+        dest: /home/ec2/gatling
+
+    - name: Copy zap code to ec2
+      copy:
+        remote_src: true
+        src: ../zap
+        dest: /home/ec2/zap
+
+    - name: Install java
+      yum:
+        name: java-1.8.0-devel
+        state: present
+
+    - name: Install maven
+      yum: # TODO: specify a version of maven
+        name: apache-maven
+        state: present
+
+    - name: Install docker
+      yum: # TODO: specify a version of docker
+        name: docker
+        state: present
+
+- hosts: localhost
+  vars:
+    region: 'eu-west-2'
+    endpoint: 'https://{service}.{region}.amazonaws.com'
+    stage: 'test'
+  tasks:
+    - name: Spin up environment
+      environment:
+        REGION: '{{ region }}'
+        ENDPOINT: '{{ endpoint }}'
+      shell:
+        chdir: ../academy-2020-piemdb
+        cmd: |
+          for DIR in resources/s3 app-api index-builder; do
+            pushd "$DIR"
+            npm install
+              ./node_modules/.bin/serverless deploy --stage {{ stage }}
+            popd
+          done
+
+    - name: Seed the DB
+      shell:
+        chdir: ../academy-2020-piemdb/scripts
+        cmd: |
+          npm install
+          NODE_ENV=test node seed-db.js
+
+- hosts: piemdb-testing
+  become: true
+  # gather_facts: true
+  tasks:
+    - name: Run gatling
+      shell: 
+        chdir: /home/ec2/gatling
+        cmd: |
+          mvn test
+
+    - name: Run zap
+      shell: 
+        chdir: /home/ec2/zap
+        cmd: |
+          docker run -v "$(pwd):/mount" \
+            -e 'REPORT_STDOUT=y' \
+            -e 'BASE_URL=http://host.docker.internal:3000' \
+            owasp/zap2docker-stable /mount/zap.sh
+
+- hosts: localhost
+  tasks:
+    - name: Teardown serverless
+      environment:
+        REGION: '{{ region }}'
+      shell:
+        chdir: ../academy-2020-piemdb
+        cmd: |
+          for DIR in resources/s3 app-api index-builder; do
+            pushd "$DIR"
+              ./node_modules/.bin/serverless remove --stage {{ stage }}
+            popd
+          done
+
+- import_playbook: terminate-ec2-instance.yml

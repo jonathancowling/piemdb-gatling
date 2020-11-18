@@ -1,0 +1,12 @@
+name: non functional tests
+on: 
+  push:
+    branches:
+      - system-integration-testing
+jobs:
+  deploy-deployment-bucket:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - working-directory: ansible
+        run: ansible-playbook -vvv run-tests.yml -i inventory
