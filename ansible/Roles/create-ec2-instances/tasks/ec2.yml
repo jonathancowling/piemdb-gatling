@@ -5,7 +5,7 @@
     region: "{{ region_name }}"
     instance_type: "{{ instance_type }}"
     image: "{{ ami_id }}"
-    vpc_subnet_id: "{{ random_subnet }}"
+    vpc_subnet_id: "{{ first_subnet }}"
     group: "{{ instance_name }}-sg"
     wait: yes
     instance_tags:
