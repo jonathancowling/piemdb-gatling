@@ -7,12 +7,21 @@ const AWS = require('aws-sdk');
 const fs = require('fs');
 const { pieData } = require('./pieData');
 
-AWS.config.update({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000',
-  accessKeyId: 'cpeahq',
-  secretAccessKey: 'y1t6ot',
-});
+const stage = process.env.NODE_ENV;
+if (stage === 'dev') {
+  AWS.config.update({
+    region: 'localhost',
+    endpoint: 'http://localhost:8000',
+    accessKeyId: 'cpeahq',
+    secretAccessKey: 'y1t6ot',
+  });
+} else if (stage === 'test') {
+  AWS.config.update({
+    region: 'eu-west-2',
+  });
+} else {
+  throw new Error('NODE_ENV set incorrectly or just not set');
+}
 const dynamodb = new AWS.DynamoDB();
 
 const batch = (batchSize) => (acc, cur) => {
@@ -33,11 +42,16 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   // console.log(`File contents: ${contents}`);
   const table = data.DataModel[0];
 
-  const result = await dynamodb.createTable(table).promise().catch((err) => {
-    console.log(err);
-    throw err;
-  });
-  console.log(result);
+  table.TableName = `PieMDB-database-${stage}`;
+  console.log(JSON.stringify(table));
+
+  if (stage === 'dev') {
+    const result = await dynamodb.createTable(table).promise().catch((err) => {
+      console.log(err);
+      throw err;
+    });
+    console.log(result);
+  }
 
   // Create data
   const pies = pieData.Pies;
