@@ -1,5 +1,5 @@
 ---
-# Create jumpbox on an EC2 instance
+# Create piemdb-testing on an EC2 instance
 - hosts: localhost
   gather_facts: False
   roles:
