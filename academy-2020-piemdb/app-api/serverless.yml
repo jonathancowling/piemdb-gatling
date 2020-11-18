@@ -5,20 +5,19 @@ frameworkVersion: '2'
 provider:
   name: aws
   runtime: nodejs12.x
-  variableSyntax: "\\${{([ ~:a-zA-Z0-9._@\\'\",\\-\\/\\(\\)]+?)}}" # allows {} inside ${}
-  stage: ${{opt:stage, 'test'}}
-  region: ${{env:REGION, 'eu-west-2'}}
+  stage: ${opt:stage, 'test'}
+  region: ${env:REGION, 'eu-west-2'}
   httpApi:
     cors: true
   deploymentBucket:
-    name: ${{self:custom.sharedBucketName}}
+    name: ${self:custom.sharedBucketName}
   environment:
-    NODE_ENV: ${{self:provider.stage}}
-    REGION: ${{self:provider.region}}
-    ENDPOINT: ${{env:ENDPOINT, 'https://{service}.{region}.amazonaws.com'}}
-    RECAPTCHA_KEY: ${{env:RECAPTCHA_KEY, 'recaptcha-not-set'}}
-    INDEX_BUCKET_NAME: piemdb-search-index-bucket-${{self:provider.stage}}
-    TABLE_NAME: PieMDB-database-${{self:provider.stage}}
+    NODE_ENV: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    ENDPOINT: ${env:ENDPOINT, self:custom.defaultEndpoint}
+    RECAPTCHA_KEY: ${env:RECAPTCHA_KEY, 'recaptcha-not-set'}
+    INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
+    TABLE_NAME: PieMDB-database-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -30,18 +29,18 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${{self:provider.environment.TABLE_NAME}}'
-        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${{self:provider.environment.TABLE_NAME}}/index/find-by-week'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${self:provider.environment.TABLE_NAME}'
+        - 'arn:aws:dynamodb:eu-west-2:455073406672:table/${self:provider.environment.TABLE_NAME}/index/find-by-week'
     - Effect: Allow
       Action:
         - s3:ListBucket
       Resource:
-        - 'arn:aws:s3:::${{self:provider.environment.INDEX_BUCKET_NAME}}'
+        - 'arn:aws:s3:::${self:provider.environment.INDEX_BUCKET_NAME}'
     - Effect: Allow
       Action:
         - s3:*Object
       Resource:
-        - 'arn:aws:s3:::${{self:provider.environment.INDEX_BUCKET_NAME}}/*'
+        - 'arn:aws:s3:::${self:provider.environment.INDEX_BUCKET_NAME}/*'
 
 functions:
   piemdb-app-api:
@@ -57,14 +56,16 @@ plugins:
   - serverless-s3-sync
 
 custom:
-  sharedBucketName: ${{cf:piemdb-shared-bucket-artifacts-${{self:provider.stage}}.S3SharedBucketArtifactsName}}
+  # variables with '{}' in them can't be placed inline as fallback strings
+  defaultEndpoint: 'https://{service}.{region}.amazonaws.com'
+  sharedBucketName: ${cf:piemdb-shared-bucket-artifacts-${self:provider.stage}.S3SharedBucketArtifactsName}
   customDomain:
-    domainName: piemdb-app-api-${{self:provider.stage}}.infinipie.works
+    domainName: piemdb-app-api-${self:provider.stage}.infinipie.works
     apiType: http
     endpointType: regional
     autoDomain: true
   s3Sync:
-    - bucketName: piemdb.infinipie.works-${{self:provider.stage}}
+    - bucketName: piemdb.infinipie.works-${self:provider.stage}
       localDir: ../app/dist
       acl: public-read 
 
@@ -73,7 +74,7 @@ resources:
     SiteBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: piemdb.infinipie.works-${{self:provider.stage}}
+        BucketName: piemdb.infinipie.works-${self:provider.stage}
         AccessControl: PublicRead
         CorsConfiguration:
           CorsRules:
