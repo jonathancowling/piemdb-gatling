@@ -20,7 +20,7 @@ if (stage === 'dev') {
     region: 'eu-west-2',
   });
 } else {
-  throw new Error('NODE_ENV set incorrectly or just not set');
+  throw new Error('NODE_ENV must be set to dev or test');
 }
 const dynamodb = new AWS.DynamoDB();
 
