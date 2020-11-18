@@ -14,7 +14,7 @@ provider:
   environment:
     NODE_ENV: ${self:provider.stage}
     REGION: ${self:provider.region}
-    ENDPOINT: ${env:ENDPOINT, 'https://{service}.{region}.amazonaws.com'}
+    ENDPOINT: ${env:ENDPOINT, 'endpoint-not-set'} # TO DO: figure out what character is the problem
     RECAPTCHA_KEY: ${env:RECAPTCHA_KEY, 'recaptcha-not-set'}
     INDEX_BUCKET_NAME: piemdb-search-index-bucket-${self:provider.stage}
     TABLE_NAME: PieMDB-database-${self:provider.stage}
