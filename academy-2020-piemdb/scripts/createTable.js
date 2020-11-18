@@ -11,8 +11,8 @@ const fs = require('fs');
 AWS.config.update({
   region: 'localhost',
   endpoint: 'http://localhost:8000',
-  accessKeyId: 'cpeahq',
-  secretAccessKey: 'y1t6ot',
+  accessKeyId: 'any-string',
+  secretAccessKey: 'any-other-string',
 });
 
 const dynamodb = new AWS.DynamoDB();
