@@ -7,6 +7,7 @@ const AWS = require('aws-sdk');
 const { pieData } = require('./pieData');
 
 const stage = process.env.NODE_ENV;
+// maybe use dotenv later to remove need for if statments
 if (stage === 'dev') {
   AWS.config.update({
     region: 'localhost',
