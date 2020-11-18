@@ -16,13 +16,19 @@ The directories that set up the ec2 parameters are group_vars/all/main.yml (used
 
 To create an ec2 instance use the following command:
 
-``` ansible-playbook create-ec2.yml -i inventory ```
+```sh
+ansible-playbook create-ec2.yml -i inventory
+```
 
 To terminate an ec2 use the following command: 
 
-```ansible-playbook terminate-ec2-instance.yml -i inventory```
+```sh
+ansible-playbook terminate-ec2-instance.yml -i inventory
+```
 
 On any command if you wanna see ansible output errors or successes run a command with this flag -vvv:
 
-```ansible-playbook -vvv create-ec2.yml -i inventory ```
-```ansible-playbook -vvv terminate-ec2-instance.yml -i inventory```
+```sh
+ansible-playbook -vvv create-ec2.yml -i inventory
+ansible-playbook -vvv terminate-ec2-instance.yml -i inventory
+```

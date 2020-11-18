@@ -7,4 +7,3 @@
 - name: Save private key
   copy: content="{{ ec2_key.key.private_key }}" dest="./keys/{{ key_name }}.pem" mode=0600
   when: ec2_key.changed
-  

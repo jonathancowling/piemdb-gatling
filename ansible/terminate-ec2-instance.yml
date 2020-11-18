@@ -21,5 +21,3 @@
         state: absent
         wait: yes
       with_items: "{{ec2_info.instances}}"
- 
-   
