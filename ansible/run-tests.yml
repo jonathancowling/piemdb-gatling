@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: local
   gather_facts: False
   roles:
     - role: create-ec2-instances
@@ -35,7 +35,7 @@
         name: docker
         state: present
 
-- hosts: localhost
+- hosts: local
   vars:
     region: 'eu-west-2'
     endpoint: 'https://{service}.{region}.amazonaws.com'
@@ -81,7 +81,7 @@
             -e 'BASE_URL=http://host.docker.internal:3000' \
             owasp/zap2docker-stable /mount/zap.sh
 
-- hosts: localhost
+- hosts: local
   tasks:
     - name: Teardown serverless
       environment:
