@@ -26,5 +26,7 @@ To terminate an ec2 use the following command:
 
 On any command if you wanna see ansible output errors or successes run a command with this flag -vvv:
 
-```ansible-playbook -vvv create-ec2.yml -i inventory ```
-```ansible-playbook -vvv terminate-ec2-instance.yml -i inventory```
+```sh
+ansible-playbook -vvv create-ec2.yml -i inventory
+ansible-playbook -vvv terminate-ec2-instance.yml -i inventory
+```
