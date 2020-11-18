@@ -72,4 +72,6 @@ const writeToTable = async (table, batchSize) => {
   }
 };
 
-writeToTable(`PieMDB-database-${process.env.NODE_ENV}`, 25);
+writeToTable(`PieMDB-database-${process.env.NODE_ENV}`, 25)
+  .then(() => console.log('Table has been seeded'))
+  .catch((err) => console.log(err));
