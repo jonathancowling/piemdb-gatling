@@ -4,16 +4,24 @@
 
 // Create AWS client
 const AWS = require('aws-sdk');
-const fs = require('fs');
 const { pieData } = require('./pieData');
 
-AWS.config.update({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000',
-  accessKeyId: 'cpeahq',
-  secretAccessKey: 'y1t6ot',
-});
-const dynamodb = new AWS.DynamoDB();
+const stage = process.env.NODE_ENV;
+// maybe use dotenv later to remove need for if statments
+if (stage === 'dev') {
+  AWS.config.update({
+    region: 'localhost',
+    endpoint: 'http://localhost:8000',
+    accessKeyId: 'any-string',
+    secretAccessKey: 'any-other-string',
+  });
+} else if (stage === 'test') {
+  AWS.config.update({
+    region: 'eu-west-2',
+  });
+} else {
+  throw new Error('NODE_ENV must be set to dev or test');
+}
 
 const batch = (batchSize) => (acc, cur) => {
   if (acc[acc.length - 1].length === batchSize) {
@@ -23,30 +31,13 @@ const batch = (batchSize) => (acc, cur) => {
   return acc;
 };
 
-// Create table
-fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
-  if (error) {
-    console.log(`Error reading file: ${error}`);
-    throw new Error('Failed to read file');
-  }
-  const data = JSON.parse(contents);
-  // console.log(`File contents: ${contents}`);
-  const table = data.DataModel[0];
-
-  const result = await dynamodb.createTable(table).promise().catch((err) => {
-    console.log(err);
-    throw err;
-  });
-  console.log(result);
-
+const writeToTable = async (table, batchSize) => {
   // Create data
   const pies = pieData.Pies;
   const reviews = pieData.Reviews;
 
   // Put data in table
   const dynamodbDocumentClient = new AWS.DynamoDB.DocumentClient();
-
-  const batchSize = 25;
 
   const batchedPies = pies.reduce(batch(batchSize), [[]]);
 
@@ -56,7 +47,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   for (let i = 0; i < batchedPies.length; i += 1) {
     const pieParams = {
       RequestItems: {
-        [table.TableName]: batchedPies[i].map((pie) => ({
+        [table]: batchedPies[i].map((pie) => ({
           PutRequest: {
             Item: pie,
           },
@@ -70,7 +61,7 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
   for (let i = 0; i < batchedReviews.length; i += 1) {
     const reviewParams = {
       RequestItems: {
-        [table.TableName]: batchedReviews[i].map((review) => ({
+        [table]: batchedReviews[i].map((review) => ({
           PutRequest: {
             Item: review,
           },
@@ -80,4 +71,8 @@ fs.readFile('./PieMDB.json', 'utf-8', async (error, contents) => {
     const reviewWriteResult = await dynamodbDocumentClient.batchWrite(reviewParams).promise();
     console.log(`review write result: ${JSON.stringify(reviewWriteResult)}`);
   }
-});
+};
+
+writeToTable(`PieMDB-database-${process.env.NODE_ENV}`, 25)
+  .then(() => console.log('Table has been seeded'))
+  .catch((err) => console.log(err));
