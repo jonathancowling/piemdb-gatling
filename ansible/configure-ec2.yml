@@ -1,0 +1,7 @@
+- hosts: piemdb-testing
+  become: True
+  gather_facts: True
+  tasks:
+
+    - name: Echo hello
+      shell: echo " Hello ec2 "
