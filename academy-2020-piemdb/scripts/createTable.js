@@ -1,4 +1,9 @@
 /* eslint-disable no-console */
+
+//------------------------------------------------------------
+// This script should only be used for running in dev mode
+//------------------------------------------------------------
+
 // Create AWS client
 const AWS = require('aws-sdk');
 const fs = require('fs');
