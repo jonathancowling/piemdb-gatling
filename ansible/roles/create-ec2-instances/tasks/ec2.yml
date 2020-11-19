@@ -2,7 +2,6 @@
 - name: Create EC2 instances
   ec2:
     key_name: "{{ key_name }}"
-    region: "{{ region_name }}"
     instance_type: "{{ instance_type }}"
     image: "{{ ami_id }}"
     vpc_subnet_id: "{{ first_subnet }}"

@@ -9,7 +9,6 @@
     name: "{{ instance_name }}-sg"
     description: Security Group for {{ instance_name }}
     vpc_id: "{{ vpc_id }}"
-    region: "{{ region_name }}"
     rules:
       - proto: tcp
         ports:

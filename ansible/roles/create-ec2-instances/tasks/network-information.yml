@@ -1,14 +1,12 @@
 ---
 - name: Obtain default VPC information
   ec2_vpc_net_facts:
-    region: "{{ region_name }}"
     filters:
       "isDefault": "true"
   register: default_vpc
 
 - name: Obtain subnets for default VPC
   ec2_vpc_subnet_facts:
-    region: "{{ region_name }}"
     filters:
       vpc-id: "{{ default_vpc['vpcs'][0]['vpc_id'] }}"
   register: subnet_info
