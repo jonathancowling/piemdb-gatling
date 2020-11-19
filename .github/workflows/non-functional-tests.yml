@@ -8,5 +8,6 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v2
+      - run: pip install botocore
       - working-directory: ansible
         run: ansible-playbook -vvv run-tests.yml -i inventory

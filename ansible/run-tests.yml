@@ -6,7 +6,6 @@
 
 - hosts: piemdb-testing
   become: true
-  # gather_facts: true
   tasks:
     - name: Copy gatling code to ec2
       copy:
@@ -19,16 +18,6 @@
         remote_src: true
         src: ../zap
         dest: /home/ec2/zap
-
-    - name: Install java
-      yum:
-        name: java-1.8.0-devel
-        state: present
-
-    - name: Install maven
-      yum: # TODO: specify a version of maven
-        name: apache-maven
-        state: present
 
     - name: Install docker
       yum: # TODO: specify a version of docker
@@ -64,22 +53,23 @@
 
 - hosts: piemdb-testing
   become: true
-  # gather_facts: true
   tasks:
     - name: Run gatling
       shell: 
         chdir: /home/ec2/gatling
         cmd: |
-          mvn test
+          docker build -t gatling .
+          docker run gatling
 
     - name: Run zap
       shell: 
         chdir: /home/ec2/zap
         cmd: |
-          docker run -v "$(pwd):/mount" \
+          docker build -t zap .
+          docker run \
             -e 'REPORT_STDOUT=y' \
             -e 'BASE_URL=http://host.docker.internal:3000' \
-            owasp/zap2docker-stable /mount/zap.sh
+            zap
 
 - hosts: local
   tasks:
