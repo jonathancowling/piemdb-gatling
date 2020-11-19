@@ -8,7 +8,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v2
-      - run: pip install botocore boto3
+      - run: pip install botocore boto3 boto
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
