@@ -18,6 +18,8 @@ module.exports.handle = async () => {
     AWS.config.update({
       region: awsRegion,
       endpoint: awsEndpoint,
+      accessKeyId: 'access_key_id',
+      secretAccessKey: 'secret_access_key',
     });
   }
   // Get data from dynamodb
