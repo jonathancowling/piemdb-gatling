@@ -1,0 +1,56 @@
+---
+- hosts: local
+  name: delete ec2
+  tasks: 
+    - name: Terminate Instances
+      ec2_instance_facts:
+        filters: 
+          "tag:Name": "{{ instance_name }}"
+      register: ec2_info
+
+    - name: displaying output  
+      debug: msg="{{item.instance_id}}"
+      with_items: "{{ec2_info.instances}}"
+
+    - name: terminate an instance by tag name
+      ec2: 
+        instance_ids: "{{item.instance_id}}"
+        state: absent
+        wait: yes
+      with_items: "{{ec2_info.instances}}"
+    
+    - name: Obtain default VPC information
+      ec2_vpc_net_facts:
+        filters:
+          "isDefault": "true"
+      register: default_vpc
+
+    - name: remove security group
+      ec2_group:
+        name: "{{ instance_name }}-sg"
+        vpc_id: "{{ default_vpc['vpcs'][0]['vpc_id'] }}"
+        state: absent
+    
+    - name: delete key pair "{{ key_name }}"
+      ec2_key:
+        name: "{{ key_name }}"
+        state: absent
+
+- hosts: local
+  vars:
+    region: 'eu-west-2'
+    endpoint: 'https://{service}.{region}.amazonaws.com'
+    stage: 'test'
+  tasks:
+    - name: Remove serverless deployment
+      environment:
+        REGION: '{{ region }}'
+        ENDPOINT: '{{ endpoint }}'
+      shell:
+        chdir: ../academy-2020-piemdb
+        cmd: |
+          for DIR in serverless-database app-api resources; do
+            pushd "$DIR"
+              ./node_modules/.bin/serverless remove --stage {{ stage }}
+            popd
+          done
