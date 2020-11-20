@@ -1,7 +1,24 @@
 ---
-- name: Create a new EC2 key pair
-  ec2_key:
-    name: "{{ key_name }}"
-  register: ec2_key
-- name: Save private key
-  copy: content="{{ ec2_key.key.private_key }}" dest="./keys/{{ key_name }}.pem" mode=0600
+# - name: Create a new EC2 key pair
+#   ec2_key:
+#     name: "{{ key_name }}"
+#   register: ec2_key
+# - name: Save private key
+#   copy: content="{{ ec2_key.key.private_key }}" dest="./keys/{{ key_name }}.pem" mode=0600
+
+# - name: recommend to use with aws_ssm lookup plugin
+#   ansible.builtin.debug:
+#     msg: "{{  }}"
+#   register: ec2_key
+
+# - name: Create a new EC2 key pair
+#   ec2_key:
+#     name: "{{ key_name }}"
+#   when: lookup('amazon.aws.aws_ssm', '{{ key_name }}')
+
+# - name: Create or update secure key/value pair with default kms key (aws/ssm)
+#   community.aws.aws_ssm_parameter_store:
+#     name: "{{ key_name }}"
+#     string_type: "SecureString"
+#     value: "{{ ec2_key.key.private_key }}"
+

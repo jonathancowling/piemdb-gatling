@@ -1,0 +1,5 @@
+plugin: amazon.aws.aws_ec2
+filters:
+  tag:Name: piemdb-jonathan
+groups:
+  piemdb-testing:

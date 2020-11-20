@@ -1,0 +1,13 @@
+---
+- hosts: local
+  gather_facts: False
+  roles:
+    - role: create-ec2-instances
+
+- hosts: piemdb-testing
+  become: true
+  tasks:
+    - name: hello
+      shell:
+        cmd: |
+          echo hello world from ec2
