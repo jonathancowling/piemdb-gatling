@@ -54,10 +54,10 @@ class BasicSimulation extends Simulation {
     .exec(repeat(3) {RandomPie.random})
 
   setUp(
-    reviewers.inject(atOnceUsers(250)),
-    submit.inject(atOnceUsers(250)),
-    readReview.inject(atOnceUsers(250)),
-    randomPie.inject(atOnceUsers(250))
+    reviewers.inject(atOnceUsers(10)),
+    submit.inject(atOnceUsers(10)),
+    readReview.inject(atOnceUsers(10)),
+    randomPie.inject(atOnceUsers(10))
   ).protocols(
     if (useProxy.toBoolean) httpProtocol.proxy(Proxy(proxyHost, proxyPort.toInt)) else httpProtocol
   ).assertions(
