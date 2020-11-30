@@ -123,7 +123,7 @@ app.get('/search/:query', asyncHandler(async (req, res) => {
   // Load index
   let data;
   // will run on prod/test bucket if the env var is defined
-  if (stage === 'prod' || process.env.INDEX_BUCKET_NAME) {
+  if (process.env.INDEX_BUCKET_NAME) {
     const s3 = new AWS.S3();
     const s3Params = {
       Bucket: process.env.INDEX_BUCKET_NAME,

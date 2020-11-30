@@ -1,0 +1,134 @@
+---
+- hosts: local
+  name: create ec2
+  tasks:
+    - name: Create a new EC2 key pair
+      ec2_key:
+        name: "{{ key_name }}"
+      register: ec2_key
+
+    - name: Save private key
+      copy: content="{{ ec2_key.key.private_key }}" dest="./keys/{{ key_name }}.pem" mode=0600
+
+    - name: Obtain default VPC information
+      ec2_vpc_net_facts:
+        filters:
+          "isDefault": "true"
+      register: default_vpc
+
+    - name: Obtain subnets for default VPC
+      ec2_vpc_subnet_facts:
+        filters:
+          vpc-id: "{{ default_vpc['vpcs'][0]['vpc_id'] }}"
+      register: subnet_info
+      
+    # - set_fact:
+    #     vpc_id: "{{ default_vpc['vpcs'][0]['vpc_id'] }}"
+    #     first_subnet: "{{ subnet_info['subnets'][0]['subnet_id'] }}"
+    # Gather IP facts from ipify.org, will be saved to ipify_public_ip
+    - name: Get my public IP
+      ipify_facts:
+
+    # Create Security Group and save the output into security_group
+    - name: Create Security Group
+      ec2_group:
+        name: "{{ instance_name }}-sg"
+        description: Security Group for {{ instance_name }}
+        vpc_id: "{{ default_vpc['vpcs'][0]['vpc_id'] }}"
+        rules:
+          - proto: tcp
+            ports:
+              - 22
+            cidr_ip: "{{ ipify_public_ip }}/32"
+            rule_desc: "allow port 22 from {{ ipify_public_ip }}"
+      register: security_group
+
+    - name: Create EC2 instances
+      ec2:
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image: "{{ ami_id }}"
+        vpc_subnet_id: "{{ subnet_info['subnets'][0]['subnet_id'] }}"
+        group: "{{ instance_name }}-sg"
+        wait: yes
+        instance_tags:
+          Name: "{{ instance_name }}"
+          Env: sandbox
+        count_tag: 
+          Name: "{{ instance_name }}"
+          Env: sandbox
+        exact_count: 1
+        assign_public_ip: yes
+      register: ec2
+
+    - name: Add new instance to host group
+      add_host:
+        hostname: "{{ item.public_ip }}"
+        groupname: piemdb-testing
+        ansible_user: ec2-user
+        ansible_ssh_private_key_file: keys/{{ key_name }}.pem
+        ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+        test: yup this works
+      loop: "{{ ec2.instances }}"
+
+    - name: Wait for SSH to come up
+      delegate_to: "{{ item.public_dns_name }}"
+      vars:
+        ansible_user: '{{ hostvars[item.public_ip].ansible_user }}'
+        ansible_ssh_private_key_file: '{{ hostvars[item.public_ip].ansible_ssh_private_key_file }}'
+        ansible_ssh_extra_args: '{{ hostvars[item.public_ip].ansible_ssh_extra_args }}'
+      wait_for_connection:
+        delay: 30
+        sleep: 10
+        timeout: 60
+      loop: "{{ ec2.instances }}"
+
+- hosts: piemdb-testing
+  name: prepare ec2
+  become: true
+  tasks:
+    - name: Copy gatling code to ec2
+      copy:
+        src: ../gatling/
+        dest: /home/ec2/gatling
+
+    - name: Copy zap code to ec2
+      copy:
+        src: ../zap/
+        dest: /home/ec2/zap
+
+    - name: Install docker
+      yum: # TODO: specify a version of docker
+        name: docker
+        state: present
+
+    - name: Start docker daemon
+      shell: systemctl start docker
+
+# - hosts: local
+#   vars:
+#     region: 'eu-west-2'
+#     endpoint: 'https://{service}.{region}.amazonaws.com'
+#     stage: 'test'
+#   tasks:
+#     - name: Serverless deploy
+#       environment:
+#         REGION: '{{ region }}'
+#         ENDPOINT: '{{ endpoint }}'
+#       shell:
+#         chdir: ../academy-2020-piemdb
+#         cmd: |
+#           for DIR in resources app-api serverless-database; do
+#             pushd "$DIR"
+#             npm install
+#               ./node_modules/.bin/serverless deploy --stage {{ stage }}
+#             popd
+#           done
+
+#     - name: Seed the DB
+#       shell:
+#         chdir: ../academy-2020-piemdb/scripts
+#         cmd: |
+#           npm install
+#           NODE_ENV=test node seed-ddb.js
+

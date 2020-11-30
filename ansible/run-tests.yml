@@ -1,0 +1,23 @@
+---
+- import_playbook: setup-test-environment.yml
+
+- hosts: piemdb-testing
+  tasks:
+    - name: Run gatling
+      shell: 
+        chdir: /home/ec2/gatling
+        cmd: |
+          docker build -t gatling .
+          docker run gatling
+
+    - name: Run zap
+      shell: 
+        chdir: /home/ec2/zap
+        cmd: |
+          docker build -t zap .
+          docker run \
+            -e 'REPORT_STDOUT=y' \
+            -e 'BASE_URL=http://host.docker.internal:3000' \
+            zap
+
+- import_playbook: teardown-test-environment.yml

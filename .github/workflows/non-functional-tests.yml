@@ -1,0 +1,19 @@
+name: non functional tests
+on: 
+  push:
+    branches:
+      - system-integration-testing
+jobs:
+  deploy-deployment-bucket:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - run: pip install botocore boto3 boto
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+      - working-directory: ansible
+        run: ansible-playbook -vvv run-tests.yml -i inventory/hosts

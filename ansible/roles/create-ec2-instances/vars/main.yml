@@ -1,0 +1,6 @@
+---
+# vars file for create-ec2-instances
+key_name: 'piemdbTesting'
+ami_id: 'ami-0271d331ac7dab654'
+instance_type: 't2.micro'
+instance_name: 'piemdb-testing'

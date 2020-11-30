@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "start": "NODE_ENV='dev' REGION='localhost' ENDPOINT='http://localhost:8000' node -e 'require(\"./handler.js\").handle()'",
+    "start": "NODE_ENV=dev REGION='localhost' ENDPOINT='http://localhost:8000' node -e 'require(\"./handler.js\").handle()'",
     "test": "NODE_ENV=dev jest"
   },
   "author": "",

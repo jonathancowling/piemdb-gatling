@@ -6,7 +6,7 @@
   "scripts": {
     "test": "TABLE_NAME='PieMDB-database-test' REGION='local-env' ENDPOINT='localhost:8000' npx jest --coverage",
     "prod": "NODE_ENV='prod' REGION='eu-west-2' ENDPOINT='https://{service}.{region}.amazonaws.com' node server.js",
-    "dev": "NODE_ENV='dev' REGION='localhost' ENDPOINT='http://localhost:8000' node server.js"
+    "dev": "NODE_ENV='dev' REGION='localhost' ENDPOINT='http://localhost:8000' TABLE_NAME='PieMDB-database-dev' node server.js"
   },
   "author": "",
   "license": "ISC",
