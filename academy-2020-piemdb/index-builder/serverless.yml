@@ -41,8 +41,6 @@ functions:
   piemdb-index-builder:
     handler: handler.handle
     memorySize: 256
-    events:
-      - schedule: rate(24 hours)
 
 resources:
   Resources:
